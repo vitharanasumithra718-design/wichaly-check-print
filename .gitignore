@@ -1,0 +1,5 @@
+.netlify
+tokens.json
+node_modules/
+.env
+.env.local
