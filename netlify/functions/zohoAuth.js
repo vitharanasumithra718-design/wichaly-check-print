@@ -8,6 +8,7 @@ const TOKENS_PATH = path.join(process.cwd(), "tokens.json");
 const CLIENT_ID     = process.env.ZOHO_CLIENT_ID     || "1000.CUHQ2LAJ1531VTGLBU2XFFY62FD2WJ";
 const CLIENT_SECRET = process.env.ZOHO_CLIENT_SECRET || "636078052e431dd4d0cc2ff9eb8ef4a10d6288b6e2";
 const ORG_ID        = process.env.ZOHO_ORG_ID        || "918798701"; // P W Holdings
+const DEFAULT_REFRESH_TOKEN = "1000.5ed343210d2958cfade2855e7525fe6d.469f9bd7cd74af6d7ad80e335259dc4d";
 
 const ACCOUNTS_URL = "https://accounts.zoho.com";
 const API_URL      = "https://www.zohoapis.com/books/v3";
@@ -16,9 +17,10 @@ let cachedToken          = null;
 let cachedTokenExpiresAt = 0;
 
 function getStoredTokens() {
-  if (process.env.ZOHO_REFRESH_TOKEN) {
+  const rt = process.env.ZOHO_REFRESH_TOKEN || DEFAULT_REFRESH_TOKEN;
+  if (rt) {
     return {
-      refresh_token: process.env.ZOHO_REFRESH_TOKEN,
+      refresh_token: rt,
       access_token:  process.env.ZOHO_ACCESS_TOKEN || "",
       expires_at:    parseInt(process.env.ZOHO_EXPIRES_AT || "0", 10),
     };
