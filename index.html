@@ -526,8 +526,16 @@
       <!-- Interactive Cheque Control Toolbar -->
       <div class="cheque-control-box no-print">
         
-        <!-- Row 1: Bank, Date, Crossing, Print Button -->
-        <div class="cq-toolbar-row">
+        <!-- Row 1: Bank, Date, Crossing, Quick Payment Selector, Print Button -->
+        <div class="cq-toolbar-row" style="flex-wrap:wrap; gap:10px;">
+          <div class="ctrl-item" style="background:#1e293b; border:1px solid #0284c7; padding:4px 10px; border-radius:8px;">
+            <label style="color:#38bdf8; font-weight:700;">⚡ Zoho Payment:</label>
+            <select id="quickPaymentSelect" onchange="if(this.value) selectPayment(this.value)" style="min-width:240px; background:#0f172a; color:#fff; border:1px solid #334155;">
+              <option value="">Loading Zoho payments...</option>
+            </select>
+            <button class="btn btn-secondary btn-sm" onclick="loadQuickPayments(true)" title="Refresh Payments">🔄</button>
+          </div>
+
           <div class="ctrl-item">
             <label>🏦 Bank:</label>
             <select id="bankPreset" onchange="applyBankPreset(this.value)" style="min-width:170px;">
@@ -548,7 +556,7 @@
 
           <div class="ctrl-item">
             <label>Crossing Mode:</label>
-            <select id="cqCrossingSelect" onchange="updateLiveCheque()" style="min-width:220px;">
+            <select id="cqCrossingSelect" onchange="updateLiveCheque()" style="min-width:200px;">
               <option value="cross_ac_payee">Cross A/C Payee (// Top-Left)</option>
               <option value="cross_ac_not_negotiable">Cross A/C Payee + Not Negotiable</option>
               <option value="cross_only">Cross Only (// Parallel Lines)</option>
@@ -1038,6 +1046,36 @@
       toast('✅ Saved calibration for ' + bank);
     }
 
+    // Load Quick Payments Dropdown & Auto-select
+    async function loadQuickPayments(manualTrigger = false) {
+      const sel = document.getElementById('quickPaymentSelect');
+      if (!sel) return;
+      if (manualTrigger) toast('🔄 Fetching recent Zoho payments...');
+      
+      try {
+        const res = await fetch('/.netlify/functions/get-record?type=list');
+        const data = await res.json();
+        if (data.success && data.payments && data.payments.length > 0) {
+          sel.innerHTML = '<option value="">⚡ Select Zoho Payment (' + data.payments.length + ' available)...</option>' +
+            data.payments.map(p => {
+              const amt = Number(p.amount || 0).toLocaleString('en-LK', { minimumFractionDigits: 2 });
+              return `<option value="${p.payment_id}">${p.vendor_name || 'Vendor'} — Rs ${amt} (#${p.payment_number || p.payment_id.slice(-6)}) [${p.date}]</option>`;
+            }).join('');
+
+          // If no specific payment was loaded yet, auto-load the most recent payment
+          const params = new URLSearchParams(window.location.search);
+          const hasUrlId = params.get('paymentID') || params.get('id') || params.get('expenseID');
+          if (!hasUrlId && (!currentRecord || !currentRecord.payment_id)) {
+            selectPayment(data.payments[0].payment_id, false);
+          }
+        } else {
+          sel.innerHTML = '<option value="">(No payments found in Zoho)</option>';
+        }
+      } catch (err) {
+        sel.innerHTML = '<option value="">(Error loading payments)</option>';
+      }
+    }
+
     // Auto-fetch from URL Params (Zoho Books Custom Button Target)
     async function initFromUrlParams() {
       const params = new URLSearchParams(window.location.search);
@@ -1047,7 +1085,11 @@
       const type = params.get('type') || (expenseId ? 'expense' : 'vendorpayment');
 
       const id = paymentId || expenseId;
-      if (!id) return;
+      if (!id) {
+        // No ID in URL -> load recent payments from Zoho
+        loadQuickPayments(false);
+        return;
+      }
 
       toast('⚡ Auto-filling details from Zoho Books...');
       try {
@@ -1060,7 +1102,10 @@
           document.getElementById('cqPayeeInput').value = data.payeeName || '';
           document.getElementById('cqAmountInput').value = data.amount || 0;
           document.getElementById('cqWordsInput').value = data.amountInWords || '';
-          if (data.date) document.getElementById('cqDateInput').value = data.date;
+          if (data.date) {
+            document.getElementById('cqDateInput').value = data.date;
+            onDateChange();
+          }
 
           // Auto-detect bank if present
           if (data.bankName) {
@@ -1075,12 +1120,15 @@
           }
 
           updateLiveCheque();
+          loadQuickPayments(false);
           toast(`✅ Auto-filled: ${data.payeeName} (Rs ${data.amountFormatted})`);
         } else {
           toast('⚠️ ' + (data.error || 'Failed to auto-fetch record'));
+          loadQuickPayments(false);
         }
       } catch (err) {
         toast('Error loading: ' + err.message);
+        loadQuickPayments(false);
       }
     }
 
@@ -1157,8 +1205,8 @@
       }
     }
 
-    async function selectPayment(paymentId) {
-      toast('Loading payment #' + paymentId);
+    async function selectPayment(paymentId, switchTab = true) {
+      if (switchTab) toast('Loading payment #' + paymentId + '...');
       try {
         const res = await fetch(`/.netlify/functions/get-record?type=vendorpayment&id=${paymentId}`);
         const data = await res.json();
@@ -1167,10 +1215,28 @@
           document.getElementById('cqPayeeInput').value = data.payeeName || '';
           document.getElementById('cqAmountInput').value = data.amount || 0;
           document.getElementById('cqWordsInput').value = data.amountInWords || '';
-          if (data.date) document.getElementById('cqDateInput').value = data.date;
+          if (data.date) {
+            document.getElementById('cqDateInput').value = data.date;
+            onDateChange();
+          }
+
+          if (data.bankName) {
+            const b = data.bankName.toLowerCase();
+            if (b.includes('sampath')) document.getElementById('bankPreset').value = 'sampath';
+            else if (b.includes('commercial')) document.getElementById('bankPreset').value = 'commercial';
+            else if (b.includes('nations') || b.includes('ntb')) document.getElementById('bankPreset').value = 'ntb';
+            else if (b.includes('hatton') || b.includes('hnb')) document.getElementById('bankPreset').value = 'hnb';
+            else if (b.includes('ceylon') || b.includes('boc')) document.getElementById('bankPreset').value = 'boc';
+            else if (b.includes('seylan')) document.getElementById('bankPreset').value = 'seylan';
+            applyBankPreset(document.getElementById('bankPreset').value);
+          }
+
+          const sel = document.getElementById('quickPaymentSelect');
+          if (sel) sel.value = paymentId;
+
           updateLiveCheque();
-          switchView('cheque');
-          toast('✅ Loaded ' + data.payeeName);
+          if (switchTab) switchView('cheque');
+          toast('✅ Loaded ' + data.payeeName + ' (Rs ' + data.amountFormatted + ')');
         }
       } catch (err) {
         toast('Error: ' + err.message);
