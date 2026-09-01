@@ -7,7 +7,10 @@ const TOKENS_PATH = path.join(process.cwd(), "tokens.json");
 
 const CLIENT_ID     = process.env.ZOHO_CLIENT_ID     || "1000.O5OO0M4Z233JXWHBH3BF3H54SMCXMH";
 const CLIENT_SECRET = process.env.ZOHO_CLIENT_SECRET || "c0f0e1f99eab52812b969b02d7164ac9bc86825d95";
-const ORG_ID        = process.env.ZOHO_ORG_ID        || "933829154"; // Wycherley International School
+const DEFAULT_ORG_ID = "933829154";
+let envOrgId = process.env.ZOHO_ORG_ID;
+if (envOrgId && (envOrgId.includes("9187") || envOrgId === "918798701")) envOrgId = null;
+const ORG_ID = envOrgId || DEFAULT_ORG_ID; // Wycherley International School
 
 const ACCOUNTS_URL = "https://accounts.zoho.com";
 const API_URL      = "https://www.zohoapis.com/books/v3";

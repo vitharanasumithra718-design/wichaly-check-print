@@ -1050,6 +1050,10 @@
       toast('✅ Saved calibration for ' + bank);
     }
 
+    function getOrgId() {
+      return (document.getElementById('cfgOrgId') && document.getElementById('cfgOrgId').value.trim()) || '933829154';
+    }
+
     // Load Quick Payments Dropdown & Auto-select
     async function loadQuickPayments(manualTrigger = false) {
       const sel = document.getElementById('quickPaymentSelect');
@@ -1057,7 +1061,7 @@
       if (manualTrigger) toast('🔄 Fetching recent Zoho payments...');
       
       try {
-        const res = await fetch('/api/get-record?type=list');
+        const res = await fetch(`/api/get-record?type=list&organizationID=${getOrgId()}`);
         const data = await res.json();
         if (data.success && data.payments && data.payments.length > 0) {
           sel.innerHTML = '<option value="">⚡ Select Zoho Payment (' + data.payments.length + ' available)...</option>' +
@@ -1145,7 +1149,7 @@
         return;
       }
       try {
-        const res = await fetch('/api/get-record?check=1');
+        const res = await fetch(`/api/get-record?check=1&organizationID=${getOrgId()}`);
         const data = await res.json();
         if (data.authorized) {
           badge.className = 'auth-badge connected';
@@ -1173,7 +1177,7 @@
       const container = document.getElementById('paymentsListContainer');
       container.innerHTML = '<p style="color:var(--text-muted);">Loading payments from Zoho Books...</p>';
       try {
-        const res = await fetch('/api/get-record?type=list');
+        const res = await fetch(`/api/get-record?type=list&organizationID=${getOrgId()}`);
         const data = await res.json();
         if (data.success && data.payments) {
           container.innerHTML = `
@@ -1213,7 +1217,7 @@
     async function selectPayment(paymentId, switchTab = true) {
       if (switchTab) toast('Loading payment #' + paymentId + '...');
       try {
-        const res = await fetch(`/api/get-record?type=vendorpayment&id=${paymentId}`);
+        const res = await fetch(`/api/get-record?type=vendorpayment&id=${paymentId}&organizationID=${getOrgId()}`);
         const data = await res.json();
         if (data.success) {
           currentRecord = data;

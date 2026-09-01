@@ -17,7 +17,9 @@ let envClientSecret = process.env.ZOHO_CLIENT_SECRET;
 if (envClientSecret && envClientSecret.includes("636078052")) envClientSecret = null; // Filter stale old org env
 const CLIENT_SECRET = envClientSecret || DEFAULT_CLIENT_SECRET;
 
-const ORG_ID = process.env.ZOHO_ORG_ID || DEFAULT_ORG_ID;
+let envOrgId = process.env.ZOHO_ORG_ID;
+if (envOrgId && (envOrgId.includes("9187") || envOrgId === "918798701")) envOrgId = null; // Filter stale old org env
+const ORG_ID = envOrgId || DEFAULT_ORG_ID;
 
 const ACCOUNTS_URL = "https://accounts.zoho.com";
 const API_URL      = "https://www.zohoapis.com/books/v3";
