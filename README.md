@@ -38,8 +38,8 @@ A standalone, ultra-fast Cheque & Voucher Printing Web Application designed for 
 
 | Variable | Value | Description |
 |---|---|---|
-| `ZOHO_CLIENT_ID` | `1000.CUHQ2LAJ1531VTGLBU2XFFY62FD2WJ` | Your Zoho API Client ID |
-| `ZOHO_CLIENT_SECRET` | `636078052e431dd4d0cc2ff9eb8ef4a10d6288b6e2` | Your Zoho API Client Secret |
+| `ZOHO_CLIENT_ID` | `1000.O5OO0M4Z233JXWHBH3BF3H54SMCXMH` | Your Zoho API Client ID |
+| `ZOHO_CLIENT_SECRET` | `c0f0e1f99eab52812b969b02d7164ac9bc86825d95` | Your Zoho API Client Secret |
 | `ZOHO_ORG_ID` | `933829154` | Wycherley International School Org ID |
 | `ZOHO_REFRESH_TOKEN` | *(Your generated OAuth Refresh Token)* | Refresh token from Zoho OAuth |
 
