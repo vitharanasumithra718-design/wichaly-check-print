@@ -4,14 +4,10 @@ const url = require("url");
 
 module.exports = async function handler(req, res) {
   const query = req.query || url.parse(req.url, true).query || {};
-  const host = req.headers.host || "localhost:8888";
+  const host = req.headers["x-forwarded-host"] || req.headers.host || "localhost:8888";
   const protocol = req.headers["x-forwarded-proto"] || (host.includes("localhost") ? "http" : "https");
   
-  const defaultRedirect = `${protocol}://${host}/api/oauthCallback`;
-  const redirectUri = process.env.VERCEL_URL
-    ? `https://${process.env.VERCEL_URL}/api/oauthCallback`
-    : (process.env.URL ? `${process.env.URL}/api/oauthCallback` : defaultRedirect);
-
+  const redirectUri = `${protocol}://${host}/api/oauthCallback`;
   const clientId = query.client_id || CLIENT_ID;
 
   if (!clientId) {

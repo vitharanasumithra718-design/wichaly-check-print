@@ -12,12 +12,9 @@ module.exports = async function handler(req, res) {
     return;
   }
 
-  const host = req.headers.host || "localhost:8888";
+  const host = req.headers["x-forwarded-host"] || req.headers.host || "localhost:8888";
   const protocol = req.headers["x-forwarded-proto"] || (host.includes("localhost") ? "http" : "https");
-  const defaultRedirect = `${protocol}://${host}/api/oauthCallback`;
-  const redirectUri = process.env.VERCEL_URL
-    ? `https://${process.env.VERCEL_URL}/api/oauthCallback`
-    : (process.env.URL ? `${process.env.URL}/api/oauthCallback` : defaultRedirect);
+  const redirectUri = `${protocol}://${host}/api/oauthCallback`;
 
   const tokenUrl =
     `${ACCOUNTS_URL}/oauth/v2/token?` +
