@@ -284,11 +284,28 @@
       position: absolute;
       top: 5.0mm;
       left: 132mm;
-      font-size: 14px;
-      letter-spacing: 1.6mm;
+      display: flex;
+      align-items: center;
+      gap: 0.8mm;
       font-family: 'Space Mono', monospace;
       font-weight: 700;
       white-space: nowrap;
+      line-height: 1;
+    }
+    .cq-date-box .d-cell {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 4.8mm;
+      text-align: center;
+      font-size: 13.5px;
+      line-height: 1;
+    }
+    .cq-date-box.skip-20 .d-century {
+      visibility: hidden !important;
+    }
+    .cq-date-box.compact-6 .d-century {
+      display: none !important;
     }
     .cq-payee {
       position: absolute;
@@ -586,9 +603,9 @@
             <label><input type="checkbox" id="chkDate" checked onchange="updateLiveCheque()"> Date:</label>
             <input type="date" id="cqDateInput" onchange="onDateChange()">
             <select id="cqDateFormat" onchange="updateLiveCheque()" style="font-size:12px; padding:4px 6px; font-weight:600; background:#0f172a; color:#38bdf8; border:1px solid #334155; border-radius:6px;">
-              <option value="dd_mm_yy" selected>DD MM YY (No '20')</option>
-              <option value="dd_mm_yyyy">DD MM YYYY (8 Digits)</option>
-              <option value="dd_mm_gap_yy">DD MM &nbsp; YY (Skip 20)</option>
+              <option value="skip_20" selected>DD MM [20] YY (Leave Space for Pre-printed 20)</option>
+              <option value="full_8">DD MM YYYY (Print All 8 Digits)</option>
+              <option value="compact_6">DD MM YY (6 Digits Compact)</option>
             </select>
           </div>
 
@@ -692,8 +709,17 @@
             <!-- Main Cheque Paper Area (7.5" x 3.875") -->
             <div class="cheque-paper" id="chequePaper">
               
-              <!-- Date Box -->
-              <div class="cq-date-box" id="cqDateBox"><b>2 0 0 7 2 6</b></div>
+              <!-- Date Box (8 Precise Digit Slots) -->
+              <div class="cq-date-box skip-20" id="cqDateBox">
+                <span class="d-cell" id="d1">0</span>
+                <span class="d-cell" id="d2">1</span>
+                <span class="d-cell" id="m1">0</span>
+                <span class="d-cell" id="m2">9</span>
+                <span class="d-cell d-century" id="y1">2</span>
+                <span class="d-cell d-century" id="y2">0</span>
+                <span class="d-cell" id="y3">2</span>
+                <span class="d-cell" id="y4">6</span>
+              </div>
 
               <!-- Crossing Graphics -->
               <div class="cq-crossing-box cross-lines" id="cqCrossingLines">
@@ -763,24 +789,29 @@
 
           <!-- Date Alignment -->
           <div class="calib-group">
-            <div class="calib-header"><span>Date Box Position &amp; Gap</span><span id="valDate">5, 132</span></div>
+            <div class="calib-header"><span>Date Box Position &amp; Grid</span><span id="valDate">5, 132</span></div>
             <div class="calib-row">
-              <span style="width:58px;">Top:</span>
+              <span style="width:70px;">Top:</span>
               <input type="range" id="calDateTop" min="0" max="30" step="0.5" value="5" oninput="updateCalib()">
             </div>
             <div class="calib-row">
-              <span style="width:58px;">Left:</span>
+              <span style="width:70px;">Left:</span>
               <input type="range" id="calDateLeft" min="80" max="170" step="0.5" value="132" oninput="updateCalib()">
             </div>
             <div class="calib-row">
-              <span style="width:58px;">Digit Gap:</span>
-              <input type="range" id="calDateSpacing" min="0" max="5" step="0.1" value="1.6" oninput="updateCalib()">
-              <span class="val" id="valDateSpacing" style="width:34px; font-size:10.5px;">1.6mm</span>
+              <span style="width:70px;">Digit Gap:</span>
+              <input type="range" id="calDateSpacing" min="0" max="4" step="0.1" value="0.8" oninput="updateCalib()">
+              <span class="val" id="valDateSpacing" style="width:34px; font-size:10.5px;">0.8mm</span>
             </div>
             <div class="calib-row">
-              <span style="width:58px;">Font Size:</span>
-              <input type="range" id="calDateFontSize" min="10" max="22" step="0.5" value="14" oninput="updateCalib()">
-              <span class="val" id="valDateFontSize" style="width:34px; font-size:10.5px;">14px</span>
+              <span style="width:70px;">Box Width:</span>
+              <input type="range" id="calDateBoxWidth" min="3" max="8" step="0.1" value="4.8" oninput="updateCalib()">
+              <span class="val" id="valDateBoxWidth" style="width:34px; font-size:10.5px;">4.8mm</span>
+            </div>
+            <div class="calib-row">
+              <span style="width:70px;">Font Size:</span>
+              <input type="range" id="calDateFontSize" min="10" max="22" step="0.5" value="13.5" oninput="updateCalib()">
+              <span class="val" id="valDateFontSize" style="width:34px; font-size:10.5px;">13.5px</span>
             </div>
           </div>
 
@@ -894,12 +925,12 @@
 
     // Bank Calibration Presets
     const BANK_PRESETS = {
-      ntb: { dateTop: 5.0, dateLeft: 132, dateSpacing: 1.6, dateFontSize: 13.5, dateFormat: 'dd_mm_yy', crossTop: 3, crossLeft: 6, payeeTop: 20, payeeLeft: 22, wordsTop: 30, wordsLeft: 22, amtTop: 42, amtRight: 24 },
-      commercial: { dateTop: 5.5, dateLeft: 128, dateSpacing: 1.8, dateFontSize: 14, dateFormat: 'dd_mm_yy', crossTop: 3, crossLeft: 6, payeeTop: 20, payeeLeft: 22, wordsTop: 31, wordsLeft: 22, amtTop: 36, amtRight: 36 },
-      sampath: { dateTop: 3, dateLeft: 128, dateSpacing: 1.8, dateFontSize: 14, dateFormat: 'dd_mm_yy', crossTop: 3, crossLeft: 6, payeeTop: 18, payeeLeft: 22, wordsTop: 28, wordsLeft: 22, amtTop: 36, amtRight: 36 },
-      hnb: { dateTop: 4.5, dateLeft: 126, dateSpacing: 1.8, dateFontSize: 14, dateFormat: 'dd_mm_yy', crossTop: 3, crossLeft: 6, payeeTop: 19, payeeLeft: 22, wordsTop: 29, wordsLeft: 22, amtTop: 35, amtRight: 34 },
-      boc: { dateTop: 5, dateLeft: 127, dateSpacing: 1.8, dateFontSize: 14, dateFormat: 'dd_mm_yy', crossTop: 3, crossLeft: 6, payeeTop: 21, payeeLeft: 20, wordsTop: 32, wordsLeft: 20, amtTop: 37, amtRight: 35 },
-      seylan: { dateTop: 5.5, dateLeft: 128, dateSpacing: 1.8, dateFontSize: 14, dateFormat: 'dd_mm_yy', crossTop: 3, crossLeft: 6, payeeTop: 20, payeeLeft: 22, wordsTop: 30, wordsLeft: 22, amtTop: 36, amtRight: 36 }
+      ntb: { dateTop: 5.0, dateLeft: 132, dateSpacing: 0.8, dateBoxWidth: 4.8, dateFontSize: 13.5, dateFormat: 'skip_20', crossTop: 3, crossLeft: 6, payeeTop: 20, payeeLeft: 22, wordsTop: 30, wordsLeft: 22, amtTop: 42, amtRight: 24 },
+      commercial: { dateTop: 5.5, dateLeft: 128, dateSpacing: 0.8, dateBoxWidth: 4.8, dateFontSize: 13.5, dateFormat: 'skip_20', crossTop: 3, crossLeft: 6, payeeTop: 20, payeeLeft: 22, wordsTop: 31, wordsLeft: 22, amtTop: 36, amtRight: 36 },
+      sampath: { dateTop: 3, dateLeft: 128, dateSpacing: 0.8, dateBoxWidth: 4.8, dateFontSize: 13.5, dateFormat: 'skip_20', crossTop: 3, crossLeft: 6, payeeTop: 18, payeeLeft: 22, wordsTop: 28, wordsLeft: 22, amtTop: 36, amtRight: 36 },
+      hnb: { dateTop: 4.5, dateLeft: 126, dateSpacing: 0.8, dateBoxWidth: 4.8, dateFontSize: 13.5, dateFormat: 'skip_20', crossTop: 3, crossLeft: 6, payeeTop: 19, payeeLeft: 22, wordsTop: 29, wordsLeft: 22, amtTop: 35, amtRight: 34 },
+      boc: { dateTop: 5, dateLeft: 127, dateSpacing: 0.8, dateBoxWidth: 4.8, dateFontSize: 13.5, dateFormat: 'skip_20', crossTop: 3, crossLeft: 6, payeeTop: 21, payeeLeft: 20, wordsTop: 32, wordsLeft: 20, amtTop: 37, amtRight: 35 },
+      seylan: { dateTop: 5.5, dateLeft: 128, dateSpacing: 0.8, dateBoxWidth: 4.8, dateFontSize: 13.5, dateFormat: 'skip_20', crossTop: 3, crossLeft: 6, payeeTop: 20, payeeLeft: 22, wordsTop: 30, wordsLeft: 22, amtTop: 36, amtRight: 36 }
     };
 
     let currentRecord = {
@@ -996,22 +1027,27 @@
       const showDate = document.getElementById('chkDate').checked;
       const d = currentRecord.dateDigits || { d1:'0', d2:'1', m1:'0', m2:'9', y1:'2', y2:'0', y3:'2', y4:'6' };
       const dateEl = document.getElementById('cqDateBox');
-      const dFormat = document.getElementById('cqDateFormat') ? document.getElementById('cqDateFormat').value : 'dd_mm_yy';
-      dateEl.style.display = showDate ? 'block' : 'none';
+      const dFormat = document.getElementById('cqDateFormat') ? document.getElementById('cqDateFormat').value : 'skip_20';
+      dateEl.style.display = showDate ? 'flex' : 'none';
 
-      let renderedDate = '';
-      if (dFormat === 'dd_mm_yy') {
-        // 6 digits, without '20': e.g. 0 1 0 9 2 6
-        renderedDate = `${d.d1} ${d.d2} ${d.m1} ${d.m2} ${d.y3} ${d.y4}`;
-      } else if (dFormat === 'dd_mm_gap_yy') {
-        // Skip pre-printed '20': e.g. 0 1 0 9   2 6
-        renderedDate = `${d.d1} ${d.d2} ${d.m1} ${d.m2}&nbsp;&nbsp;&nbsp;${d.y3} ${d.y4}`;
-      } else {
-        // Full 8 digits: e.g. 0 1 0 9 2 0 2 6
-        renderedDate = `${d.d1} ${d.d2} ${d.m1} ${d.m2} ${d.y1} ${d.y2} ${d.y3} ${d.y4}`;
+      dateEl.classList.remove('skip-20', 'compact-6');
+      if (dFormat === 'skip_20') {
+        dateEl.classList.add('skip-20');
+      } else if (dFormat === 'compact_6') {
+        dateEl.classList.add('compact-6');
       }
 
-      dateEl.innerHTML = `<b>${renderedDate}</b>`;
+      if (document.getElementById('d1')) {
+        document.getElementById('d1').textContent = d.d1;
+        document.getElementById('d2').textContent = d.d2;
+        document.getElementById('m1').textContent = d.m1;
+        document.getElementById('m2').textContent = d.m2;
+        document.getElementById('y1').textContent = d.y1;
+        document.getElementById('y2').textContent = d.y2;
+        document.getElementById('y3').textContent = d.y3;
+        document.getElementById('y4').textContent = d.y4;
+      }
+
       document.getElementById('cfDate').textContent = `${d.d1}${d.d2}/${d.m1}${d.m2}/${d.y1}${d.y2}${d.y3}${d.y4}`;
 
       // Amount (Words)
@@ -1100,8 +1136,9 @@
 
       const dTop = document.getElementById('calDateTop').value;
       const dLeft = document.getElementById('calDateLeft').value;
-      const dSpacing = document.getElementById('calDateSpacing')?.value || 1.6;
-      const dFontSize = document.getElementById('calDateFontSize')?.value || 14;
+      const dSpacing = parseFloat(document.getElementById('calDateSpacing')?.value || 0.8);
+      const dBoxWidth = parseFloat(document.getElementById('calDateBoxWidth')?.value || 4.8);
+      const dFontSize = parseFloat(document.getElementById('calDateFontSize')?.value || 13.5);
 
       const cTop = document.getElementById('calCrossTop')?.value || 3;
       const cLeft = document.getElementById('calCrossLeft')?.value || 6;
@@ -1115,6 +1152,7 @@
 
       if (document.getElementById('valDate')) document.getElementById('valDate').textContent = `${dTop}, ${dLeft}`;
       if (document.getElementById('valDateSpacing')) document.getElementById('valDateSpacing').textContent = `${dSpacing}mm`;
+      if (document.getElementById('valDateBoxWidth')) document.getElementById('valDateBoxWidth').textContent = `${dBoxWidth}mm`;
       if (document.getElementById('valDateFontSize')) document.getElementById('valDateFontSize').textContent = `${dFontSize}px`;
       if (document.getElementById('valCross')) document.getElementById('valCross').textContent = `${cTop}, ${cLeft}`;
       if (document.getElementById('valPayee')) document.getElementById('valPayee').textContent = `${pTop}, ${pLeft}`;
@@ -1122,10 +1160,15 @@
       if (document.getElementById('valAmt')) document.getElementById('valAmt').textContent = `${aTop}, ${aRight}`;
 
       const dateEl = document.getElementById('cqDateBox');
-      dateEl.style.top = dTop + 'mm';
-      dateEl.style.left = dLeft + 'mm';
-      dateEl.style.letterSpacing = dSpacing + 'mm';
-      dateEl.style.fontSize = dFontSize + 'px';
+      if (dateEl) {
+        dateEl.style.top = dTop + 'mm';
+        dateEl.style.left = dLeft + 'mm';
+        dateEl.style.gap = dSpacing + 'mm';
+        dateEl.querySelectorAll('.d-cell').forEach(cell => {
+          cell.style.width = dBoxWidth + 'mm';
+          cell.style.fontSize = dFontSize + 'px';
+        });
+      }
 
       const linesEl = document.getElementById('cqCrossingLines');
       if (linesEl) {
@@ -1157,8 +1200,9 @@
       if (document.getElementById('calMasterLeft')) document.getElementById('calMasterLeft').value = p.masterLeft || 0;
       if (document.getElementById('calDateTop')) document.getElementById('calDateTop').value = p.dateTop;
       if (document.getElementById('calDateLeft')) document.getElementById('calDateLeft').value = p.dateLeft;
-      if (document.getElementById('calDateSpacing')) document.getElementById('calDateSpacing').value = p.dateSpacing || 1.6;
-      if (document.getElementById('calDateFontSize')) document.getElementById('calDateFontSize').value = p.dateFontSize || 14;
+      if (document.getElementById('calDateSpacing')) document.getElementById('calDateSpacing').value = p.dateSpacing || 0.8;
+      if (document.getElementById('calDateBoxWidth')) document.getElementById('calDateBoxWidth').value = p.dateBoxWidth || 4.8;
+      if (document.getElementById('calDateFontSize')) document.getElementById('calDateFontSize').value = p.dateFontSize || 13.5;
       if (document.getElementById('cqDateFormat') && p.dateFormat) document.getElementById('cqDateFormat').value = p.dateFormat;
       if (document.getElementById('calCrossTop')) document.getElementById('calCrossTop').value = p.crossTop || 3;
       if (document.getElementById('calCrossLeft')) document.getElementById('calCrossLeft').value = p.crossLeft || 6;
@@ -1188,9 +1232,10 @@
         masterLeft: document.getElementById('calMasterLeft')?.value || 0,
         dateTop: document.getElementById('calDateTop').value,
         dateLeft: document.getElementById('calDateLeft').value,
-        dateSpacing: document.getElementById('calDateSpacing')?.value || 1.6,
-        dateFontSize: document.getElementById('calDateFontSize')?.value || 14,
-        dateFormat: document.getElementById('cqDateFormat')?.value || 'dd_mm_yy',
+        dateSpacing: document.getElementById('calDateSpacing')?.value || 0.8,
+        dateBoxWidth: document.getElementById('calDateBoxWidth')?.value || 4.8,
+        dateFontSize: document.getElementById('calDateFontSize')?.value || 13.5,
+        dateFormat: document.getElementById('cqDateFormat')?.value || 'skip_20',
         crossTop: document.getElementById('calCrossTop')?.value || 3,
         crossLeft: document.getElementById('calCrossLeft')?.value || 6,
         payeeTop: document.getElementById('calPayeeTop').value,
