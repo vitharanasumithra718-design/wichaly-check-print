@@ -5,9 +5,19 @@ const path = require("path");
 
 const TOKENS_PATH = process.env.VERCEL ? "/tmp/tokens.json" : path.join(process.cwd(), "tokens.json");
 
-const CLIENT_ID     = process.env.ZOHO_CLIENT_ID     || "1000.O5OO0M4Z233JXWHBH3BF3H54SMCXMH";
-const CLIENT_SECRET = process.env.ZOHO_CLIENT_SECRET || "c0f0e1f99eab52812b969b02d7164ac9bc86825d95";
-const ORG_ID        = process.env.ZOHO_ORG_ID        || "933829154"; // Wycherley International School
+const DEFAULT_CLIENT_ID     = "1000.O5OO0M4Z233JXWHBH3BF3H54SMCXMH";
+const DEFAULT_CLIENT_SECRET = "c0f0e1f99eab52812b969b02d7164ac9bc86825d95";
+const DEFAULT_ORG_ID        = "933829154"; // Wycherley International School
+
+let envClientId = process.env.ZOHO_CLIENT_ID;
+if (envClientId && envClientId.includes("CUHQ")) envClientId = null; // Filter stale old org env
+const CLIENT_ID = envClientId || DEFAULT_CLIENT_ID;
+
+let envClientSecret = process.env.ZOHO_CLIENT_SECRET;
+if (envClientSecret && envClientSecret.includes("636078052")) envClientSecret = null; // Filter stale old org env
+const CLIENT_SECRET = envClientSecret || DEFAULT_CLIENT_SECRET;
+
+const ORG_ID = process.env.ZOHO_ORG_ID || DEFAULT_ORG_ID;
 
 const ACCOUNTS_URL = "https://accounts.zoho.com";
 const API_URL      = "https://www.zohoapis.com/books/v3";
@@ -42,10 +52,11 @@ function saveTokens(tokens) {
   }
 }
 
-async function refreshAccessToken(refreshToken, clientId, clientSecret) {
+async function refreshAccessToken(refreshToken, clientId, clientSecret, accountsServer) {
   const cId = clientId || CLIENT_ID;
   const cSec = clientSecret || CLIENT_SECRET;
-  const url = `${ACCOUNTS_URL}/oauth/v2/token?refresh_token=${refreshToken}&client_id=${cId}&client_secret=${cSec}&grant_type=refresh_token`;
+  const baseAccounts = accountsServer || ACCOUNTS_URL;
+  const url = `${baseAccounts}/oauth/v2/token?refresh_token=${refreshToken}&client_id=${cId}&client_secret=${cSec}&grant_type=refresh_token`;
   const res  = await fetch(url, { method: "POST" });
   const data = await res.json();
   if (!data.access_token) {

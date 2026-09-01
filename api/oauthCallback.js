@@ -16,28 +16,60 @@ module.exports = async function handler(req, res) {
   const protocol = req.headers["x-forwarded-proto"] || (host.includes("localhost") ? "http" : "https");
   const redirectUri = `${protocol}://${host}/api/oauthCallback`;
 
-  const tokenUrl =
-    `${ACCOUNTS_URL}/oauth/v2/token?` +
-    `code=${encodeURIComponent(code)}&` +
-    `client_id=${encodeURIComponent(CLIENT_ID)}&` +
-    `client_secret=${encodeURIComponent(CLIENT_SECRET)}&` +
-    `redirect_uri=${encodeURIComponent(redirectUri)}&` +
-    `grant_type=authorization_code`;
+  const accountsServer = (query["accounts-server"] || ACCOUNTS_URL).replace(/\/+$/, "");
+  const tokenUrl = `${accountsServer}/oauth/v2/token`;
 
-  const apiRes = await fetch(tokenUrl, { method: "POST" });
-  const data = await apiRes.json();
+  const params = new URLSearchParams({
+    code: code,
+    client_id: CLIENT_ID,
+    client_secret: CLIENT_SECRET,
+    redirect_uri: redirectUri,
+    grant_type: "authorization_code",
+  });
 
-  if (!data.refresh_token) {
-    res.writeHead(500, { "Content-Type": "text/html; charset=utf-8" });
-    res.end(`<h2>Error getting tokens</h2><pre>${JSON.stringify(data, null, 2)}</pre><p><a href="/api/oauthStart">Try again</a></p>`);
-    return;
-  }
+  try {
+    const apiRes = await fetch(tokenUrl, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+      body: params.toString(),
+    });
 
-  data.expires_at = Date.now() + (data.expires_in || 3600) * 1000;
-  saveTokens(data);
+    const data = await apiRes.json();
 
-  res.writeHead(200, { "Content-Type": "text/html; charset=utf-8" });
-  res.end(`<!DOCTYPE html>
+    if (!data.refresh_token) {
+      res.writeHead(500, { "Content-Type": "text/html; charset=utf-8" });
+      res.end(`<!DOCTYPE html>
+<html>
+<head>
+  <title>Zoho Connection</title>
+  <meta charset="utf-8">
+  <style>
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #0f172a; color: #f8fafc; display:flex; align-items:center; justify-content:center; min-height:100vh; margin:0; }
+    .card { background:#1e293b; border: 1px solid #ef4444; border-radius:16px; padding:30px; max-width:540px; text-align:center; }
+    h2 { color:#f87171; margin-top:0; }
+    pre { background:#0f172a; padding:12px; border-radius:8px; text-align:left; font-size:13px; color:#fca5a5; overflow-x:auto; }
+    a.btn { display:inline-block; background:#0284c7; color:#fff; padding:10px 22px; border-radius:8px; text-decoration:none; font-weight:600; margin-top:14px; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h2>Error Connecting to Zoho</h2>
+    <p>The authorization code was expired or already used.</p>
+    <pre>${JSON.stringify(data, null, 2)}</pre>
+    <a class="btn" href="/api/oauthStart">🔄 Click Here to Try Again</a>
+  </div>
+</body>
+</html>`);
+      return;
+    }
+
+    data.expires_at = Date.now() + (data.expires_in || 3600) * 1000;
+    saveTokens(data);
+
+    res.writeHead(200, { "Content-Type": "text/html; charset=utf-8" });
+    res.end(`<!DOCTYPE html>
 <html>
 <head>
   <title>Zoho Connection Successful</title>
@@ -75,4 +107,8 @@ module.exports = async function handler(req, res) {
   </script>
 </body>
 </html>`);
+  } catch (err) {
+    res.writeHead(500, { "Content-Type": "text/html; charset=utf-8" });
+    res.end(`<h2>Token Exchange Network Error</h2><pre>${err.message}</pre><p><a href="/api/oauthStart">Try again</a></p>`);
+  }
 };
