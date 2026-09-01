@@ -282,42 +282,40 @@
     /* Cheque Floating Elements with exact mm placements */
     .cq-date-box {
       position: absolute;
-      top: 7.5mm;
-      left: 135mm;
+      top: 5.0mm;
+      left: 132mm;
       font-size: 14px;
+      letter-spacing: 1.6mm;
       font-family: 'Space Mono', monospace;
-      font-weight: 600;
+      font-weight: 700;
       white-space: nowrap;
     }
     .cq-payee {
       position: absolute;
-      top: 22.5mm;
-      left: 24mm;
-      font-size: 13px;
-      font-weight: 600;
+      top: 20mm;
+      left: 22mm;
+      font-size: 14px;
+      font-weight: 700;
       text-transform: uppercase;
       white-space: nowrap;
-      letter-spacing: 0.2px;
     }
     .cq-words {
       position: absolute;
       top: 31mm;
-      left: 24mm;
-      width: 105mm;
-      font-size: 12px;
+      left: 22mm;
+      width: 90mm;
+      font-size: 13.5px;
       font-weight: 600;
-      line-height: 1.5;
-      letter-spacing: 0.1px;
+      line-height: 1.45;
     }
     .cq-amount-num {
       position: absolute;
-      top: 38mm;
-      right: 18mm;
-      font-size: 14.5px;
-      font-weight: 600;
+      top: 36mm;
+      right: 36mm;
+      font-size: 16px;
+      font-weight: 700;
       font-family: 'Space Mono', monospace;
       white-space: nowrap;
-      letter-spacing: 0.3px;
     }
 
     /* Crossing Graphics (Top-Left 2 Parallel Diagonal Lines & Text) */
@@ -358,19 +356,6 @@
       letter-spacing: 1px;
       text-transform: uppercase;
       text-align: center;
-      white-space: nowrap;
-    }
-
-    /* Ahead of Date Crossing (Top Header) */
-    .cq-ahead-date {
-      position: absolute;
-      top: 7.5mm;
-      left: 88mm;
-      font-size: 11px;
-      font-weight: 700;
-      letter-spacing: 0.5px;
-      font-family: 'Space Mono', monospace, sans-serif;
-      text-transform: uppercase;
       white-space: nowrap;
     }
 
@@ -600,19 +585,17 @@
           <div class="ctrl-item">
             <label><input type="checkbox" id="chkDate" checked onchange="updateLiveCheque()"> Date:</label>
             <input type="date" id="cqDateInput" onchange="onDateChange()">
-            <select id="cqDateFormat" onchange="updateLiveCheque()" style="font-size:12px; padding:4px 6px; background:#0f172a; color:#fff; border:1px solid #475569; border-radius:6px;">
-              <option value="ntb_20" selected>DD MM [20] YY (NTB Pre-printed 20)</option>
-              <option value="8">8 Digits (DD MM YYYY)</option>
-              <option value="6">6 Digits (DD MM YY)</option>
+            <select id="cqDateFormat" onchange="updateLiveCheque()" style="font-size:12px; padding:4px 6px; font-weight:600; background:#0f172a; color:#38bdf8; border:1px solid #334155; border-radius:6px;">
+              <option value="dd_mm_yy" selected>DD MM YY (No '20')</option>
+              <option value="dd_mm_yyyy">DD MM YYYY (8 Digits)</option>
+              <option value="dd_mm_gap_yy">DD MM &nbsp; YY (Skip 20)</option>
             </select>
           </div>
 
           <div class="ctrl-item">
             <label>Crossing Mode:</label>
-            <select id="cqCrossingSelect" onchange="updateLiveCheque()" style="min-width:230px;">
-              <option value="ahead_date_ac" selected>// ACCOUNT PAYEE ONLY // (Ahead of Date)</option>
-              <option value="ahead_date_plain">ACCOUNT PAYEE ONLY (Ahead of Date)</option>
-              <option value="cross_ac_payee">Cross A/C Payee (// Top-Left Corner)</option>
+            <select id="cqCrossingSelect" onchange="updateLiveCheque()" style="min-width:200px;">
+              <option value="cross_ac_payee" selected>Cross A/C Payee (// Top-Left)</option>
               <option value="cross_ac_not_negotiable">Cross A/C Payee + Not Negotiable</option>
               <option value="cross_only">Cross Only (// Parallel Lines)</option>
               <option value="center_ac_payee">Center Banner (A/C PAYEE ONLY)</option>
@@ -629,7 +612,7 @@
         <div class="cq-toolbar-row">
           <div class="ctrl-item" style="flex:1; min-width:240px;">
             <label><input type="checkbox" id="chkPayee" checked onchange="updateLiveCheque()"> Payee:</label>
-            <input type="text" id="cqPayeeInput" value="AP Holdings" placeholder="Payee name" oninput="updateLiveCheque()" style="width:100%;">
+            <input type="text" id="cqPayeeInput" value="CHILL AIR AUTO A/C (Pvt) Ltd" placeholder="Payee name" oninput="updateLiveCheque()" style="width:100%;">
           </div>
 
           <div class="ctrl-item">
@@ -666,24 +649,6 @@
 
           <div class="ctrl-item">
             <label><input type="checkbox" id="chkStrikeBearer" onchange="updateLiveCheque()"> Strike "Or Bearer"</label>
-          </div>
-
-          <div class="ctrl-item">
-            <label>🔤 Weight:</label>
-            <select id="cqFontWeight" onchange="updateLiveCheque()" style="padding:3px 6px; font-size:12px; background:#0f172a; color:#fff; border:1px solid #475569; border-radius:6px;">
-              <option value="500">Normal (500)</option>
-              <option value="600" selected>Medium-Bold (600)</option>
-              <option value="700">Heavy Bold (700)</option>
-            </select>
-          </div>
-
-          <div class="ctrl-item">
-            <label>📏 Size:</label>
-            <select id="cqFontSizeScale" onchange="updateLiveCheque()" style="padding:3px 6px; font-size:12px; background:#0f172a; color:#fff; border:1px solid #475569; border-radius:6px;">
-              <option value="compact">Compact (-1px)</option>
-              <option value="standard" selected>Standard (Refined)</option>
-              <option value="large">Large (+1px)</option>
-            </select>
           </div>
 
           <div class="ctrl-item">
@@ -730,9 +695,6 @@
               <!-- Date Box -->
               <div class="cq-date-box" id="cqDateBox"><b>2 0 0 7 2 6</b></div>
 
-              <!-- Ahead of Date Crossing -->
-              <div class="cq-ahead-date" id="cqAheadDate" style="display:none;">// ACCOUNT PAYEE ONLY //</div>
-
               <!-- Crossing Graphics -->
               <div class="cq-crossing-box cross-lines" id="cqCrossingLines">
                 <div class="cq-crossing-text" id="cqCrossingLineText">A/C PAYEE ONLY</div>
@@ -743,7 +705,7 @@
               <div class="cq-payee" id="cqPayee"><b>AP Holdings</b></div>
 
               <!-- Strike Or Bearer -->
-              <div class="cq-bearer-strike" id="cqBearerStrike" style="display:none;"><s>OR BEARER</s></div>
+              <div class="cq-bearer-strike" id="cqBearerStrike"><s>OR BEARER</s></div>
 
               <!-- Amount in Words -->
               <div class="cq-words" id="cqWords"><b>Eighteen and Cents Zero Only</b></div>
@@ -752,10 +714,10 @@
               <div class="cq-amount-num" id="cqAmountNum"><b>18.00</b></div>
 
               <!-- Company Label -->
-              <div class="cq-company" id="cqCompany" style="display:none;">WYCHERLEY INTERNATIONAL SCHOOL</div>
+              <div class="cq-company" id="cqCompany">WYCHERLEY INTERNATIONAL SCHOOL</div>
 
               <!-- Signatures -->
-              <div class="cq-signatures" id="cqSignatures" style="display:none;">
+              <div class="cq-signatures" id="cqSignatures">
                 <div class="cq-sig-block" id="sigBlock1">
                   <div class="cq-sig-line"></div>
                   <div class="cq-sig-label">Authorised Signatory</div>
@@ -801,37 +763,37 @@
 
           <!-- Date Alignment -->
           <div class="calib-group">
-            <div class="calib-header"><span>Date Box Position</span><span id="valDate">7.5, 135.5</span></div>
+            <div class="calib-header"><span>Date Box Position &amp; Gap</span><span id="valDate">5, 132</span></div>
             <div class="calib-row">
-              <span style="width:36px;">Top:</span>
-              <input type="range" id="calDateTop" min="0" max="40" step="0.5" value="7.5" oninput="updateCalib()">
+              <span style="width:58px;">Top:</span>
+              <input type="range" id="calDateTop" min="0" max="30" step="0.5" value="5" oninput="updateCalib()">
             </div>
             <div class="calib-row">
-              <span style="width:36px;">Left:</span>
-              <input type="range" id="calDateLeft" min="80" max="180" step="0.5" value="135.5" oninput="updateCalib()">
+              <span style="width:58px;">Left:</span>
+              <input type="range" id="calDateLeft" min="80" max="170" step="0.5" value="132" oninput="updateCalib()">
             </div>
             <div class="calib-row">
-              <span style="width:36px;">Grid:</span>
-              <input type="range" id="calDateSpacing" min="3.0" max="6.5" step="0.05" value="3.95" oninput="updateCalib()">
-              <span id="valDateSpacing" style="font-size:10px; width:44px; text-align:right; font-family:monospace;">3.95mm</span>
+              <span style="width:58px;">Digit Gap:</span>
+              <input type="range" id="calDateSpacing" min="0" max="5" step="0.1" value="1.6" oninput="updateCalib()">
+              <span class="val" id="valDateSpacing" style="width:34px; font-size:10.5px;">1.6mm</span>
             </div>
             <div class="calib-row">
-              <span style="width:36px;">Size:</span>
-              <input type="range" id="calDateSize" min="9.0" max="16.0" step="0.5" value="12.0" oninput="updateCalib()">
-              <span id="valDateSize" style="font-size:10px; width:44px; text-align:right; font-family:monospace;">12.0px</span>
+              <span style="width:58px;">Font Size:</span>
+              <input type="range" id="calDateFontSize" min="10" max="22" step="0.5" value="14" oninput="updateCalib()">
+              <span class="val" id="valDateFontSize" style="width:34px; font-size:10.5px;">14px</span>
             </div>
           </div>
 
-          <!-- Ahead-Date Crossing Alignment -->
+          <!-- Crossing Position -->
           <div class="calib-group">
-            <div class="calib-header"><span>Ahead-Date Crossing</span><span id="valCross">7.5, 88</span></div>
+            <div class="calib-header"><span>Crossing Alignment</span><span id="valCross">3, 6</span></div>
             <div class="calib-row">
-              <span style="width:36px;">Top:</span>
-              <input type="range" id="calCrossTop" min="0" max="30" step="0.5" value="7.5" oninput="updateCalib()">
+              <span style="width:58px;">Top:</span>
+              <input type="range" id="calCrossTop" min="0" max="40" step="0.5" value="3" oninput="updateCalib()">
             </div>
             <div class="calib-row">
-              <span style="width:36px;">Left:</span>
-              <input type="range" id="calCrossLeft" min="40" max="140" step="0.5" value="88" oninput="updateCalib()">
+              <span style="width:58px;">Left:</span>
+              <input type="range" id="calCrossLeft" min="0" max="100" step="0.5" value="6" oninput="updateCalib()">
             </div>
           </div>
 
@@ -932,22 +894,22 @@
 
     // Bank Calibration Presets
     const BANK_PRESETS = {
-      ntb: { dateTop: 7.5, dateLeft: 135.5, dateSpacing: 3.95, dateSize: 12.0, dateFormat: "ntb_20", crossingMode: "ahead_date_ac", crossTop: 7.5, crossLeft: 88, payeeTop: 22.5, payeeLeft: 24, wordsTop: 31, wordsLeft: 24, amtTop: 38, amtRight: 18, masterTop: 0, masterLeft: 0 },
-      commercial: { dateTop: 5.5, dateLeft: 128, dateSpacing: 4.8, dateSize: 12.5, dateFormat: "8", crossingMode: "cross_ac_payee", crossTop: 7.5, crossLeft: 88, payeeTop: 20, payeeLeft: 22, wordsTop: 31, wordsLeft: 22, amtTop: 36, amtRight: 36, masterTop: 0, masterLeft: 0 },
-      sampath: { dateTop: 4.0, dateLeft: 128, dateSpacing: 4.8, dateSize: 12.5, dateFormat: "8", crossingMode: "cross_ac_payee", crossTop: 7.5, crossLeft: 88, payeeTop: 19, payeeLeft: 22, wordsTop: 29, wordsLeft: 22, amtTop: 36, amtRight: 36, masterTop: 0, masterLeft: 0 },
-      hnb: { dateTop: 5.5, dateLeft: 128, dateSpacing: 4.8, dateSize: 12.5, dateFormat: "8", crossingMode: "cross_ac_payee", crossTop: 7.5, crossLeft: 88, payeeTop: 20, payeeLeft: 22, wordsTop: 30, wordsLeft: 22, amtTop: 36, amtRight: 34, masterTop: 0, masterLeft: 0 },
-      boc: { dateTop: 5.0, dateLeft: 127, dateSpacing: 4.8, dateSize: 12.5, dateFormat: "8", crossingMode: "cross_ac_payee", crossTop: 7.5, crossLeft: 88, payeeTop: 21, payeeLeft: 20, wordsTop: 32, wordsLeft: 20, amtTop: 37, amtRight: 35, masterTop: 0, masterLeft: 0 },
-      seylan: { dateTop: 5.5, dateLeft: 128, dateSpacing: 4.8, dateSize: 12.5, dateFormat: "8", crossingMode: "cross_ac_payee", crossTop: 7.5, crossLeft: 88, payeeTop: 20, payeeLeft: 22, wordsTop: 30, wordsLeft: 22, amtTop: 36, amtRight: 36, masterTop: 0, masterLeft: 0 }
+      ntb: { dateTop: 5.0, dateLeft: 132, dateSpacing: 1.6, dateFontSize: 13.5, dateFormat: 'dd_mm_yy', crossTop: 3, crossLeft: 6, payeeTop: 20, payeeLeft: 22, wordsTop: 30, wordsLeft: 22, amtTop: 42, amtRight: 24 },
+      commercial: { dateTop: 5.5, dateLeft: 128, dateSpacing: 1.8, dateFontSize: 14, dateFormat: 'dd_mm_yy', crossTop: 3, crossLeft: 6, payeeTop: 20, payeeLeft: 22, wordsTop: 31, wordsLeft: 22, amtTop: 36, amtRight: 36 },
+      sampath: { dateTop: 3, dateLeft: 128, dateSpacing: 1.8, dateFontSize: 14, dateFormat: 'dd_mm_yy', crossTop: 3, crossLeft: 6, payeeTop: 18, payeeLeft: 22, wordsTop: 28, wordsLeft: 22, amtTop: 36, amtRight: 36 },
+      hnb: { dateTop: 4.5, dateLeft: 126, dateSpacing: 1.8, dateFontSize: 14, dateFormat: 'dd_mm_yy', crossTop: 3, crossLeft: 6, payeeTop: 19, payeeLeft: 22, wordsTop: 29, wordsLeft: 22, amtTop: 35, amtRight: 34 },
+      boc: { dateTop: 5, dateLeft: 127, dateSpacing: 1.8, dateFontSize: 14, dateFormat: 'dd_mm_yy', crossTop: 3, crossLeft: 6, payeeTop: 21, payeeLeft: 20, wordsTop: 32, wordsLeft: 20, amtTop: 37, amtRight: 35 },
+      seylan: { dateTop: 5.5, dateLeft: 128, dateSpacing: 1.8, dateFontSize: 14, dateFormat: 'dd_mm_yy', crossTop: 3, crossLeft: 6, payeeTop: 20, payeeLeft: 22, wordsTop: 30, wordsLeft: 22, amtTop: 36, amtRight: 36 }
     };
 
     let currentRecord = {
-      payeeName: 'AP Holdings',
-      dateDigits: { d1: '2', d2: '0', m1: '0', m2: '7', y1: '2', y2: '0', y3: '2', y4: '6' },
-      date: '2026-07-20',
-      amount: 18.00,
-      amountFormatted: '18.00',
-      amountInWords: 'Eighteen and Cents Zero Only',
-      paymentNumber: '26072011'
+      payeeName: 'CHILL AIR AUTO A/C (Pvt) Ltd',
+      dateDigits: { d1: '0', d2: '1', m1: '0', m2: '9', y1: '2', y2: '0', y3: '2', y4: '6' },
+      date: '2026-09-01',
+      amount: 1234567.00,
+      amountFormatted: '1,234,567.00',
+      amountInWords: 'Twelve Lakh Thirty Four Thousand Five Hundred and Sixty Seven and Cents Zero Only',
+      paymentNumber: '1001'
     };
 
     function toast(msg) {
@@ -1022,59 +984,34 @@
     }
 
     function updateLiveCheque() {
-      const fw = document.getElementById('cqFontWeight')?.value || '600';
-      const scale = document.getElementById('cqFontSizeScale')?.value || 'standard';
-
-      let payeeSize = '13px';
-      let wordsSize = '12px';
-      let amtSize = '14.5px';
-
-      const customDateSize = parseFloat(document.getElementById('calDateSize')?.value);
-      let dateSize = !isNaN(customDateSize) ? customDateSize + 'px' : '12.0px';
-
-      if (scale === 'compact') {
-        payeeSize = '12px';
-        wordsSize = '11px';
-        amtSize = '13.5px';
-        if (isNaN(customDateSize)) dateSize = '11.5px';
-      } else if (scale === 'large') {
-        payeeSize = '14px';
-        wordsSize = '13px';
-        amtSize = '15.5px';
-        if (isNaN(customDateSize)) dateSize = '13.0px';
-      }
-
       // Payee
       const showPayee = document.getElementById('chkPayee').checked;
       const payeeVal = document.getElementById('cqPayeeInput').value;
       const payeeEl = document.getElementById('cqPayee');
       payeeEl.style.display = showPayee ? 'block' : 'none';
-      payeeEl.style.fontSize = payeeSize;
-      payeeEl.style.fontWeight = fw;
-      payeeEl.textContent = payeeVal;
+      payeeEl.innerHTML = `<b>${escapeHtml(payeeVal)}</b>`;
       document.getElementById('cfPayee').textContent = payeeVal;
 
       // Date
       const showDate = document.getElementById('chkDate').checked;
       const d = currentRecord.dateDigits || { d1:'0', d2:'1', m1:'0', m2:'9', y1:'2', y2:'0', y3:'2', y4:'6' };
       const dateEl = document.getElementById('cqDateBox');
-      dateEl.style.display = showDate ? 'flex' : 'none';
-      dateEl.style.alignItems = 'center';
+      const dFormat = document.getElementById('cqDateFormat') ? document.getElementById('cqDateFormat').value : 'dd_mm_yy';
+      dateEl.style.display = showDate ? 'block' : 'none';
 
-      const fmt = document.getElementById('cqDateFormat')?.value || 'ntb_20';
-      const spacing = parseFloat(document.getElementById('calDateSpacing')?.value || 3.95);
-
-      let digits = [];
-      if (fmt === 'ntb_20') {
-        // Pre-printed '2 0' in boxes 5 and 6 on NTB cheques
-        digits = [d.d1, d.d2, d.m1, d.m2, '', '', d.y3, d.y4];
-      } else if (fmt === '6') {
-        digits = [d.d1, d.d2, d.m1, d.m2, d.y3, d.y4];
+      let renderedDate = '';
+      if (dFormat === 'dd_mm_yy') {
+        // 6 digits, without '20': e.g. 0 1 0 9 2 6
+        renderedDate = `${d.d1} ${d.d2} ${d.m1} ${d.m2} ${d.y3} ${d.y4}`;
+      } else if (dFormat === 'dd_mm_gap_yy') {
+        // Skip pre-printed '20': e.g. 0 1 0 9   2 6
+        renderedDate = `${d.d1} ${d.d2} ${d.m1} ${d.m2}&nbsp;&nbsp;&nbsp;${d.y3} ${d.y4}`;
       } else {
-        digits = [d.d1, d.d2, d.m1, d.m2, d.y1, d.y2, d.y3, d.y4];
+        // Full 8 digits: e.g. 0 1 0 9 2 0 2 6
+        renderedDate = `${d.d1} ${d.d2} ${d.m1} ${d.m2} ${d.y1} ${d.y2} ${d.y3} ${d.y4}`;
       }
 
-      dateEl.innerHTML = digits.map(dig => `<span style="display:inline-block; width:${spacing}mm; text-align:center; font-family:'Space Mono', monospace; font-weight:${fw}; font-size:${dateSize};">${dig !== undefined && dig !== '' ? dig : '&nbsp;'}</span>`).join('');
+      dateEl.innerHTML = `<b>${renderedDate}</b>`;
       document.getElementById('cfDate').textContent = `${d.d1}${d.d2}/${d.m1}${d.m2}/${d.y1}${d.y2}${d.y3}${d.y4}`;
 
       // Amount (Words)
@@ -1082,9 +1019,7 @@
       const wordsVal = document.getElementById('cqWordsInput').value;
       const wordsEl = document.getElementById('cqWords');
       wordsEl.style.display = showWords ? 'block' : 'none';
-      wordsEl.style.fontSize = wordsSize;
-      wordsEl.style.fontWeight = fw;
-      wordsEl.textContent = wordsVal;
+      wordsEl.innerHTML = `<b>${escapeHtml(wordsVal)}</b>`;
 
       // Amount (Num)
       const showAmt = document.getElementById('chkAmount').checked;
@@ -1092,9 +1027,7 @@
       const amtFmt = amtVal.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
       const amtEl = document.getElementById('cqAmountNum');
       amtEl.style.display = showAmt ? 'block' : 'none';
-      amtEl.style.fontSize = amtSize;
-      amtEl.style.fontWeight = fw;
-      amtEl.textContent = amtFmt;
+      amtEl.innerHTML = `<b>${amtFmt}</b>`;
       document.getElementById('cfAmt').textContent = amtFmt;
 
       // Crossing
@@ -1102,25 +1035,11 @@
       const linesEl = document.getElementById('cqCrossingLines');
       const linesText = document.getElementById('cqCrossingLineText');
       const centerEl = document.getElementById('cqAcCenter');
-      const aheadEl = document.getElementById('cqAheadDate');
 
       linesEl.style.display = 'none';
       centerEl.style.display = 'none';
-      if (aheadEl) aheadEl.style.display = 'none';
 
-      if (crossingMode === 'ahead_date_ac') {
-        if (aheadEl) {
-          aheadEl.style.display = 'block';
-          aheadEl.textContent = '// ACCOUNT PAYEE ONLY //';
-          aheadEl.style.fontWeight = fw === '500' ? '600' : '700';
-        }
-      } else if (crossingMode === 'ahead_date_plain') {
-        if (aheadEl) {
-          aheadEl.style.display = 'block';
-          aheadEl.textContent = 'ACCOUNT PAYEE ONLY';
-          aheadEl.style.fontWeight = fw === '500' ? '600' : '700';
-        }
-      } else if (crossingMode === 'cross_ac_payee') {
+      if (crossingMode === 'cross_ac_payee') {
         linesEl.style.display = 'flex';
         linesText.textContent = 'A/C PAYEE ONLY';
       } else if (crossingMode === 'cross_ac_not_negotiable') {
@@ -1181,10 +1100,12 @@
 
       const dTop = document.getElementById('calDateTop').value;
       const dLeft = document.getElementById('calDateLeft').value;
-      const dSpacing = document.getElementById('calDateSpacing')?.value || 3.95;
-      const dSize = document.getElementById('calDateSize')?.value || 12.0;
-      const cTop = document.getElementById('calCrossTop')?.value || 7.5;
-      const cLeft = document.getElementById('calCrossLeft')?.value || 88;
+      const dSpacing = document.getElementById('calDateSpacing')?.value || 1.6;
+      const dFontSize = document.getElementById('calDateFontSize')?.value || 14;
+
+      const cTop = document.getElementById('calCrossTop')?.value || 3;
+      const cLeft = document.getElementById('calCrossLeft')?.value || 6;
+
       const pTop = document.getElementById('calPayeeTop').value;
       const pLeft = document.getElementById('calPayeeLeft').value;
       const wTop = document.getElementById('calWordsTop').value;
@@ -1192,22 +1113,24 @@
       const aTop = document.getElementById('calAmtTop').value;
       const aRight = document.getElementById('calAmtRight').value;
 
-      document.getElementById('valDate').textContent = `${dTop}, ${dLeft}`;
-      if (document.getElementById('valDateSpacing')) document.getElementById('valDateSpacing').textContent = dSpacing + 'mm';
-      if (document.getElementById('valDateSize')) document.getElementById('valDateSize').textContent = dSize + 'px';
+      if (document.getElementById('valDate')) document.getElementById('valDate').textContent = `${dTop}, ${dLeft}`;
+      if (document.getElementById('valDateSpacing')) document.getElementById('valDateSpacing').textContent = `${dSpacing}mm`;
+      if (document.getElementById('valDateFontSize')) document.getElementById('valDateFontSize').textContent = `${dFontSize}px`;
       if (document.getElementById('valCross')) document.getElementById('valCross').textContent = `${cTop}, ${cLeft}`;
-      document.getElementById('valPayee').textContent = `${pTop}, ${pLeft}`;
-      document.getElementById('valWords').textContent = `${wTop}, ${wLeft}`;
-      document.getElementById('valAmt').textContent = `${aTop}, ${aRight}`;
+      if (document.getElementById('valPayee')) document.getElementById('valPayee').textContent = `${pTop}, ${pLeft}`;
+      if (document.getElementById('valWords')) document.getElementById('valWords').textContent = `${wTop}, ${wLeft}`;
+      if (document.getElementById('valAmt')) document.getElementById('valAmt').textContent = `${aTop}, ${aRight}`;
 
       const dateEl = document.getElementById('cqDateBox');
       dateEl.style.top = dTop + 'mm';
       dateEl.style.left = dLeft + 'mm';
+      dateEl.style.letterSpacing = dSpacing + 'mm';
+      dateEl.style.fontSize = dFontSize + 'px';
 
-      const aheadEl = document.getElementById('cqAheadDate');
-      if (aheadEl) {
-        aheadEl.style.top = cTop + 'mm';
-        aheadEl.style.left = cLeft + 'mm';
+      const linesEl = document.getElementById('cqCrossingLines');
+      if (linesEl) {
+        linesEl.style.top = cTop + 'mm';
+        linesEl.style.left = cLeft + 'mm';
       }
 
       const payeeEl = document.getElementById('cqPayee');
@@ -1221,7 +1144,6 @@
       const amtEl = document.getElementById('cqAmountNum');
       amtEl.style.top = aTop + 'mm';
       amtEl.style.right = aRight + 'mm';
-      updateLiveCheque();
     }
 
     function applyBankPreset(presetKey) {
@@ -1233,20 +1155,20 @@
 
       if (document.getElementById('calMasterTop')) document.getElementById('calMasterTop').value = p.masterTop || 0;
       if (document.getElementById('calMasterLeft')) document.getElementById('calMasterLeft').value = p.masterLeft || 0;
-      if (document.getElementById('calDateSpacing')) document.getElementById('calDateSpacing').value = p.dateSpacing || 3.95;
-      if (document.getElementById('calDateSize')) document.getElementById('calDateSize').value = p.dateSize || 12.0;
-      if (document.getElementById('cqDateFormat')) document.getElementById('cqDateFormat').value = p.dateFormat || 'ntb_20';
-      if (document.getElementById('cqCrossingSelect')) document.getElementById('cqCrossingSelect').value = p.crossingMode || 'ahead_date_ac';
-      if (document.getElementById('calCrossTop')) document.getElementById('calCrossTop').value = p.crossTop || 7.5;
-      if (document.getElementById('calCrossLeft')) document.getElementById('calCrossLeft').value = p.crossLeft || 88;
-      document.getElementById('calDateTop').value = p.dateTop;
-      document.getElementById('calDateLeft').value = p.dateLeft;
-      document.getElementById('calPayeeTop').value = p.payeeTop;
-      document.getElementById('calPayeeLeft').value = p.payeeLeft;
-      document.getElementById('calWordsTop').value = p.wordsTop;
-      document.getElementById('calWordsLeft').value = p.wordsLeft;
-      document.getElementById('calAmtTop').value = p.amtTop;
-      document.getElementById('calAmtRight').value = p.amtRight;
+      if (document.getElementById('calDateTop')) document.getElementById('calDateTop').value = p.dateTop;
+      if (document.getElementById('calDateLeft')) document.getElementById('calDateLeft').value = p.dateLeft;
+      if (document.getElementById('calDateSpacing')) document.getElementById('calDateSpacing').value = p.dateSpacing || 1.6;
+      if (document.getElementById('calDateFontSize')) document.getElementById('calDateFontSize').value = p.dateFontSize || 14;
+      if (document.getElementById('cqDateFormat') && p.dateFormat) document.getElementById('cqDateFormat').value = p.dateFormat;
+      if (document.getElementById('calCrossTop')) document.getElementById('calCrossTop').value = p.crossTop || 3;
+      if (document.getElementById('calCrossLeft')) document.getElementById('calCrossLeft').value = p.crossLeft || 6;
+      if (document.getElementById('calPayeeTop')) document.getElementById('calPayeeTop').value = p.payeeTop;
+      if (document.getElementById('calPayeeLeft')) document.getElementById('calPayeeLeft').value = p.payeeLeft;
+      if (document.getElementById('calWordsTop')) document.getElementById('calWordsTop').value = p.wordsTop;
+      if (document.getElementById('calWordsLeft')) document.getElementById('calWordsLeft').value = p.wordsLeft;
+      if (document.getElementById('calAmtTop')) document.getElementById('calAmtTop').value = p.amtTop;
+      if (document.getElementById('calAmtRight')) document.getElementById('calAmtRight').value = p.amtRight;
+      updateLiveCheque();
       updateCalib();
     }
 
@@ -1256,7 +1178,7 @@
       if (document.getElementById('calMasterTop')) document.getElementById('calMasterTop').value = 0;
       if (document.getElementById('calMasterLeft')) document.getElementById('calMasterLeft').value = 0;
       updateCalib();
-      toast('Reset to NTB preset');
+      toast('Reset to Nations Trust Bank (NTB) preset');
     }
 
     function saveBankProfile() {
@@ -1266,12 +1188,11 @@
         masterLeft: document.getElementById('calMasterLeft')?.value || 0,
         dateTop: document.getElementById('calDateTop').value,
         dateLeft: document.getElementById('calDateLeft').value,
-        dateSpacing: document.getElementById('calDateSpacing')?.value || 3.95,
-        dateSize: document.getElementById('calDateSize')?.value || 12.0,
-        dateFormat: document.getElementById('cqDateFormat')?.value || 'ntb_20',
-        crossingMode: document.getElementById('cqCrossingSelect')?.value || 'ahead_date_ac',
-        crossTop: document.getElementById('calCrossTop')?.value || 7.5,
-        crossLeft: document.getElementById('calCrossLeft')?.value || 88,
+        dateSpacing: document.getElementById('calDateSpacing')?.value || 1.6,
+        dateFontSize: document.getElementById('calDateFontSize')?.value || 14,
+        dateFormat: document.getElementById('cqDateFormat')?.value || 'dd_mm_yy',
+        crossTop: document.getElementById('calCrossTop')?.value || 3,
+        crossLeft: document.getElementById('calCrossLeft')?.value || 6,
         payeeTop: document.getElementById('calPayeeTop').value,
         payeeLeft: document.getElementById('calPayeeLeft').value,
         wordsTop: document.getElementById('calWordsTop').value,
