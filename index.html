@@ -446,30 +446,67 @@
     /* =========================================================================
        PRINT RULES (PERFECT ZERO MARGIN CHEQUE PRINT)
        ========================================================================= */
+    @page {
+      size: auto;
+      margin: 0mm !important;
+    }
+
     @media print {
+      @page {
+        size: auto;
+        margin: 0mm !important;
+      }
       body, html {
-        background: #fff !important;
+        background: transparent !important;
         margin: 0 !important;
         padding: 0 !important;
-        overflow: hidden !important;
+        width: 100% !important;
+        height: 100% !important;
+        overflow: visible !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
       }
       .file-warn-banner, header.app-nav, .cheque-control-box, .calib-card, .no-print, .toast {
         display: none !important;
       }
-      .container { max-width: none !important; padding: 0 !important; margin: 0 !important; }
-      .studio-grid { display: block !important; }
+      .container {
+        max-width: none !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        width: 100% !important;
+      }
+      .studio-grid {
+        display: block !important;
+        width: 100% !important;
+        margin: 0 !important;
+        padding: 0 !important;
+      }
       .preview-canvas-card {
         background: none !important;
         border: none !important;
+        box-shadow: none !important;
         padding: 0 !important;
         margin: 0 !important;
         min-height: auto !important;
+        display: block !important;
       }
 
       .full-cheque-wrapper {
         box-shadow: none !important;
+        border: none !important;
+        border-radius: 0 !important;
+        background: transparent !important;
         page-break-inside: avoid !important;
         page-break-after: avoid !important;
+      }
+
+      .cheque-paper {
+        box-shadow: none !important;
+        border: none !important;
+        background: transparent !important;
+      }
+      .cheque-paper.show-guide {
+        background-image: none !important;
       }
 
       /* Cheque without counterfoil */
@@ -479,10 +516,6 @@
       body.mode-cheque-single .cheque-paper {
         width: 7.5in !important;
         height: 3.875in !important;
-      }
-      @page {
-        size: 7.5in 3.875in;
-        margin: 0;
       }
     }
   </style>
