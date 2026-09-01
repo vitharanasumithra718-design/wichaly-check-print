@@ -787,6 +787,10 @@
           <input type="text" id="cfgOrgId" value="933829154" style="width:100%; background:#0f172a; border:1px solid #334155; padding:8px 12px; color:#fff; border-radius:6px;">
         </div>
         <div style="margin-bottom:14px;">
+          <label style="font-size:12px; font-weight:700; color:var(--text-muted); display:block; margin-bottom:4px;">Zoho Client ID</label>
+          <input type="text" id="cfgClientId" value="1000.O5OO0M4Z233JXWHBH3BF3H54SMCXMH" style="width:100%; background:#0f172a; border:1px solid #334155; padding:8px 12px; color:#fff; border-radius:6px; font-family:monospace; font-size:12px;">
+        </div>
+        <div style="margin-bottom:14px;">
           <label style="font-size:12px; font-weight:700; color:var(--text-muted); display:block; margin-bottom:4px;">Default Company Label on Cheque</label>
           <input type="text" id="cfgCompanyName" value="WYCHERLEY INTERNATIONAL SCHOOL" style="width:100%; background:#0f172a; border:1px solid #334155; padding:8px 12px; color:#fff; border-radius:6px; font-weight:700;">
         </div>
@@ -1158,10 +1162,11 @@
 
     function startOAuth() {
       if (location.protocol === 'file:') {
-        alert('⚠️ Cannot connect from file:// mode.\n\nPlease double-click "start.bat" in the pw-cheque-printer folder to open http://localhost:8888, or deploy to Netlify.');
+        alert('⚠️ Cannot connect from file:// mode.\n\nPlease double-click "start.bat" in the pw-cheque-printer folder to open http://localhost:8888, or deploy to Vercel/Netlify.');
         return;
       }
-      window.open('/api/oauthStart', '_blank', 'width=650,height=600');
+      const cId = document.getElementById('cfgClientId') ? document.getElementById('cfgClientId').value.trim() : '1000.O5OO0M4Z233JXWHBH3BF3H54SMCXMH';
+      window.open(`/api/oauthStart?client_id=${encodeURIComponent(cId)}`, '_blank', 'width=650,height=600');
     }
 
     async function loadRecentPayments() {
