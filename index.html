@@ -815,6 +815,11 @@
               <input type="range" id="calDateSpacing" min="3.0" max="6.5" step="0.05" value="3.95" oninput="updateCalib()">
               <span id="valDateSpacing" style="font-size:10px; width:44px; text-align:right; font-family:monospace;">3.95mm</span>
             </div>
+            <div class="calib-row">
+              <span style="width:36px;">Size:</span>
+              <input type="range" id="calDateSize" min="9.0" max="16.0" step="0.5" value="12.0" oninput="updateCalib()">
+              <span id="valDateSize" style="font-size:10px; width:44px; text-align:right; font-family:monospace;">12.0px</span>
+            </div>
           </div>
 
           <!-- Ahead-Date Crossing Alignment -->
@@ -927,12 +932,12 @@
 
     // Bank Calibration Presets
     const BANK_PRESETS = {
-      ntb: { dateTop: 7.5, dateLeft: 135.5, dateSpacing: 3.95, dateFormat: "ntb_20", crossingMode: "ahead_date_ac", crossTop: 7.5, crossLeft: 88, payeeTop: 22.5, payeeLeft: 24, wordsTop: 31, wordsLeft: 24, amtTop: 38, amtRight: 18, masterTop: 0, masterLeft: 0 },
-      commercial: { dateTop: 5.5, dateLeft: 128, dateSpacing: 4.8, dateFormat: "8", crossingMode: "cross_ac_payee", crossTop: 7.5, crossLeft: 88, payeeTop: 20, payeeLeft: 22, wordsTop: 31, wordsLeft: 22, amtTop: 36, amtRight: 36, masterTop: 0, masterLeft: 0 },
-      sampath: { dateTop: 4.0, dateLeft: 128, dateSpacing: 4.8, dateFormat: "8", crossingMode: "cross_ac_payee", crossTop: 7.5, crossLeft: 88, payeeTop: 19, payeeLeft: 22, wordsTop: 29, wordsLeft: 22, amtTop: 36, amtRight: 36, masterTop: 0, masterLeft: 0 },
-      hnb: { dateTop: 5.5, dateLeft: 128, dateSpacing: 4.8, dateFormat: "8", crossingMode: "cross_ac_payee", crossTop: 7.5, crossLeft: 88, payeeTop: 20, payeeLeft: 22, wordsTop: 30, wordsLeft: 22, amtTop: 36, amtRight: 34, masterTop: 0, masterLeft: 0 },
-      boc: { dateTop: 5.0, dateLeft: 127, dateSpacing: 4.8, dateFormat: "8", crossingMode: "cross_ac_payee", crossTop: 7.5, crossLeft: 88, payeeTop: 21, payeeLeft: 20, wordsTop: 32, wordsLeft: 20, amtTop: 37, amtRight: 35, masterTop: 0, masterLeft: 0 },
-      seylan: { dateTop: 5.5, dateLeft: 128, dateSpacing: 4.8, dateFormat: "8", crossingMode: "cross_ac_payee", crossTop: 7.5, crossLeft: 88, payeeTop: 20, payeeLeft: 22, wordsTop: 30, wordsLeft: 22, amtTop: 36, amtRight: 36, masterTop: 0, masterLeft: 0 }
+      ntb: { dateTop: 7.5, dateLeft: 135.5, dateSpacing: 3.95, dateSize: 12.0, dateFormat: "ntb_20", crossingMode: "ahead_date_ac", crossTop: 7.5, crossLeft: 88, payeeTop: 22.5, payeeLeft: 24, wordsTop: 31, wordsLeft: 24, amtTop: 38, amtRight: 18, masterTop: 0, masterLeft: 0 },
+      commercial: { dateTop: 5.5, dateLeft: 128, dateSpacing: 4.8, dateSize: 12.5, dateFormat: "8", crossingMode: "cross_ac_payee", crossTop: 7.5, crossLeft: 88, payeeTop: 20, payeeLeft: 22, wordsTop: 31, wordsLeft: 22, amtTop: 36, amtRight: 36, masterTop: 0, masterLeft: 0 },
+      sampath: { dateTop: 4.0, dateLeft: 128, dateSpacing: 4.8, dateSize: 12.5, dateFormat: "8", crossingMode: "cross_ac_payee", crossTop: 7.5, crossLeft: 88, payeeTop: 19, payeeLeft: 22, wordsTop: 29, wordsLeft: 22, amtTop: 36, amtRight: 36, masterTop: 0, masterLeft: 0 },
+      hnb: { dateTop: 5.5, dateLeft: 128, dateSpacing: 4.8, dateSize: 12.5, dateFormat: "8", crossingMode: "cross_ac_payee", crossTop: 7.5, crossLeft: 88, payeeTop: 20, payeeLeft: 22, wordsTop: 30, wordsLeft: 22, amtTop: 36, amtRight: 34, masterTop: 0, masterLeft: 0 },
+      boc: { dateTop: 5.0, dateLeft: 127, dateSpacing: 4.8, dateSize: 12.5, dateFormat: "8", crossingMode: "cross_ac_payee", crossTop: 7.5, crossLeft: 88, payeeTop: 21, payeeLeft: 20, wordsTop: 32, wordsLeft: 20, amtTop: 37, amtRight: 35, masterTop: 0, masterLeft: 0 },
+      seylan: { dateTop: 5.5, dateLeft: 128, dateSpacing: 4.8, dateSize: 12.5, dateFormat: "8", crossingMode: "cross_ac_payee", crossTop: 7.5, crossLeft: 88, payeeTop: 20, payeeLeft: 22, wordsTop: 30, wordsLeft: 22, amtTop: 36, amtRight: 36, masterTop: 0, masterLeft: 0 }
     };
 
     let currentRecord = {
@@ -1023,18 +1028,20 @@
       let payeeSize = '13px';
       let wordsSize = '12px';
       let amtSize = '14.5px';
-      let dateSize = '14px';
+
+      const customDateSize = parseFloat(document.getElementById('calDateSize')?.value);
+      let dateSize = !isNaN(customDateSize) ? customDateSize + 'px' : '12.0px';
 
       if (scale === 'compact') {
         payeeSize = '12px';
         wordsSize = '11px';
         amtSize = '13.5px';
-        dateSize = '13px';
+        if (isNaN(customDateSize)) dateSize = '11.5px';
       } else if (scale === 'large') {
         payeeSize = '14px';
         wordsSize = '13px';
         amtSize = '15.5px';
-        dateSize = '15px';
+        if (isNaN(customDateSize)) dateSize = '13.0px';
       }
 
       // Payee
@@ -1175,6 +1182,7 @@
       const dTop = document.getElementById('calDateTop').value;
       const dLeft = document.getElementById('calDateLeft').value;
       const dSpacing = document.getElementById('calDateSpacing')?.value || 3.95;
+      const dSize = document.getElementById('calDateSize')?.value || 12.0;
       const cTop = document.getElementById('calCrossTop')?.value || 7.5;
       const cLeft = document.getElementById('calCrossLeft')?.value || 88;
       const pTop = document.getElementById('calPayeeTop').value;
@@ -1186,6 +1194,7 @@
 
       document.getElementById('valDate').textContent = `${dTop}, ${dLeft}`;
       if (document.getElementById('valDateSpacing')) document.getElementById('valDateSpacing').textContent = dSpacing + 'mm';
+      if (document.getElementById('valDateSize')) document.getElementById('valDateSize').textContent = dSize + 'px';
       if (document.getElementById('valCross')) document.getElementById('valCross').textContent = `${cTop}, ${cLeft}`;
       document.getElementById('valPayee').textContent = `${pTop}, ${pLeft}`;
       document.getElementById('valWords').textContent = `${wTop}, ${wLeft}`;
@@ -1225,6 +1234,7 @@
       if (document.getElementById('calMasterTop')) document.getElementById('calMasterTop').value = p.masterTop || 0;
       if (document.getElementById('calMasterLeft')) document.getElementById('calMasterLeft').value = p.masterLeft || 0;
       if (document.getElementById('calDateSpacing')) document.getElementById('calDateSpacing').value = p.dateSpacing || 3.95;
+      if (document.getElementById('calDateSize')) document.getElementById('calDateSize').value = p.dateSize || 12.0;
       if (document.getElementById('cqDateFormat')) document.getElementById('cqDateFormat').value = p.dateFormat || 'ntb_20';
       if (document.getElementById('cqCrossingSelect')) document.getElementById('cqCrossingSelect').value = p.crossingMode || 'ahead_date_ac';
       if (document.getElementById('calCrossTop')) document.getElementById('calCrossTop').value = p.crossTop || 7.5;
@@ -1257,6 +1267,7 @@
         dateTop: document.getElementById('calDateTop').value,
         dateLeft: document.getElementById('calDateLeft').value,
         dateSpacing: document.getElementById('calDateSpacing')?.value || 3.95,
+        dateSize: document.getElementById('calDateSize')?.value || 12.0,
         dateFormat: document.getElementById('cqDateFormat')?.value || 'ntb_20',
         crossingMode: document.getElementById('cqCrossingSelect')?.value || 'ahead_date_ac',
         crossTop: document.getElementById('calCrossTop')?.value || 7.5,
