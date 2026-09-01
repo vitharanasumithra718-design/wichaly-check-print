@@ -735,6 +735,27 @@
             <button class="btn btn-ghost btn-sm" onclick="resetCalibration()">Reset</button>
           </h3>
 
+          <!-- Master Page Offset -->
+          <div class="calib-group" style="background:#0f2b48; border:1px solid #0284c7; margin-bottom:12px;">
+            <div class="calib-header" style="color:#38bdf8;">
+              <span>🎯 Whole Cheque Shift</span>
+              <span id="valMaster">Top: 0mm, Left: 0mm</span>
+            </div>
+            <div class="calib-row">
+              <span style="width:36px;">Top:</span>
+              <input type="range" id="calMasterTop" min="0" max="200" step="1" value="0" oninput="updateCalib()">
+            </div>
+            <div class="calib-row">
+              <span style="width:36px;">Left:</span>
+              <input type="range" id="calMasterLeft" min="0" max="150" step="1" value="0" oninput="updateCalib()">
+            </div>
+            <div style="display:flex; gap:4px; margin-top:6px;">
+              <button class="btn btn-ghost btn-sm" style="flex:1; font-size:10.5px; padding:3px 4px;" onclick="setMasterOffset(0, 0)">Top (0mm)</button>
+              <button class="btn btn-ghost btn-sm" style="flex:1; font-size:10.5px; padding:3px 4px;" onclick="setMasterOffset(30, 0)">Mid (30mm)</button>
+              <button class="btn btn-ghost btn-sm" style="flex:1; font-size:10.5px; padding:3px 4px;" onclick="setMasterOffset(60, 0)">Center (60mm)</button>
+            </div>
+          </div>
+
           <!-- Date Alignment -->
           <div class="calib-group">
             <div class="calib-header"><span>Date Box Position</span><span id="valDate">4.5, 126</span></div>
@@ -1016,7 +1037,25 @@
       return String(s).replace(/[&<>"']/g, m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
     }
 
+    function setMasterOffset(top, left) {
+      if (document.getElementById('calMasterTop')) document.getElementById('calMasterTop').value = top;
+      if (document.getElementById('calMasterLeft')) document.getElementById('calMasterLeft').value = left;
+      updateCalib();
+      toast(`Shifted cheque: Top ${top}mm, Left ${left}mm`);
+    }
+
     function updateCalib() {
+      const mTop = parseFloat(document.getElementById('calMasterTop')?.value || 0);
+      const mLeft = parseFloat(document.getElementById('calMasterLeft')?.value || 0);
+      if (document.getElementById('valMaster')) {
+        document.getElementById('valMaster').textContent = `Top: ${mTop}mm, Left: ${mLeft}mm`;
+      }
+      const wrapper = document.getElementById('fullChequeWrapper');
+      if (wrapper) {
+        wrapper.style.marginTop = mTop + 'mm';
+        wrapper.style.marginLeft = mLeft + 'mm';
+      }
+
       const dTop = document.getElementById('calDateTop').value;
       const dLeft = document.getElementById('calDateLeft').value;
       const pTop = document.getElementById('calPayeeTop').value;
@@ -1049,7 +1088,14 @@
     }
 
     function applyBankPreset(presetKey) {
-      const p = BANK_PRESETS[presetKey] || BANK_PRESETS.hnb;
+      const saved = localStorage.getItem('pw_calib_' + presetKey);
+      let p = BANK_PRESETS[presetKey] || BANK_PRESETS.hnb;
+      if (saved) {
+        try { p = { ...p, ...JSON.parse(saved) }; } catch (_) {}
+      }
+
+      if (document.getElementById('calMasterTop')) document.getElementById('calMasterTop').value = p.masterTop || 0;
+      if (document.getElementById('calMasterLeft')) document.getElementById('calMasterLeft').value = p.masterLeft || 0;
       document.getElementById('calDateTop').value = p.dateTop;
       document.getElementById('calDateLeft').value = p.dateLeft;
       document.getElementById('calPayeeTop').value = p.payeeTop;
@@ -1064,12 +1110,17 @@
     function resetCalibration() {
       applyBankPreset('hnb');
       document.getElementById('bankPreset').value = 'hnb';
+      if (document.getElementById('calMasterTop')) document.getElementById('calMasterTop').value = 0;
+      if (document.getElementById('calMasterLeft')) document.getElementById('calMasterLeft').value = 0;
+      updateCalib();
       toast('Reset to HNB preset');
     }
 
     function saveBankProfile() {
       const bank = document.getElementById('bankPreset').value;
       const cfg = {
+        masterTop: document.getElementById('calMasterTop')?.value || 0,
+        masterLeft: document.getElementById('calMasterLeft')?.value || 0,
         dateTop: document.getElementById('calDateTop').value,
         dateLeft: document.getElementById('calDateLeft').value,
         payeeTop: document.getElementById('calPayeeTop').value,
