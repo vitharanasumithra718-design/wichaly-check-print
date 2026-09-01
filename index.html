@@ -1053,7 +1053,7 @@
       if (manualTrigger) toast('🔄 Fetching recent Zoho payments...');
       
       try {
-        const res = await fetch('/.netlify/functions/get-record?type=list');
+        const res = await fetch('/api/get-record?type=list');
         const data = await res.json();
         if (data.success && data.payments && data.payments.length > 0) {
           sel.innerHTML = '<option value="">⚡ Select Zoho Payment (' + data.payments.length + ' available)...</option>' +
@@ -1093,7 +1093,7 @@
 
       toast('⚡ Auto-filling details from Zoho Books...');
       try {
-        const res = await fetch(`/.netlify/functions/get-record?type=${type}&id=${id}&organizationID=${orgId}`);
+        const res = await fetch(`/api/get-record?type=${type}&id=${id}&organizationID=${orgId}`);
         const data = await res.json();
         if (data.success) {
           currentRecord = data;
@@ -1141,7 +1141,7 @@
         return;
       }
       try {
-        const res = await fetch('/.netlify/functions/get-record?check=1');
+        const res = await fetch('/api/get-record?check=1');
         const data = await res.json();
         if (data.authorized) {
           badge.className = 'auth-badge connected';
@@ -1161,14 +1161,14 @@
         alert('⚠️ Cannot connect from file:// mode.\n\nPlease double-click "start.bat" in the pw-cheque-printer folder to open http://localhost:8888, or deploy to Netlify.');
         return;
       }
-      window.open('/.netlify/functions/oauthStart', '_blank', 'width=650,height=600');
+      window.open('/api/oauthStart', '_blank', 'width=650,height=600');
     }
 
     async function loadRecentPayments() {
       const container = document.getElementById('paymentsListContainer');
       container.innerHTML = '<p style="color:var(--text-muted);">Loading payments from Zoho Books...</p>';
       try {
-        const res = await fetch('/.netlify/functions/get-record?type=list');
+        const res = await fetch('/api/get-record?type=list');
         const data = await res.json();
         if (data.success && data.payments) {
           container.innerHTML = `
@@ -1208,7 +1208,7 @@
     async function selectPayment(paymentId, switchTab = true) {
       if (switchTab) toast('Loading payment #' + paymentId + '...');
       try {
-        const res = await fetch(`/.netlify/functions/get-record?type=vendorpayment&id=${paymentId}`);
+        const res = await fetch(`/api/get-record?type=vendorpayment&id=${paymentId}`);
         const data = await res.json();
         if (data.success) {
           currentRecord = data;

@@ -1,6 +1,6 @@
 # Wycherley International School — Cheque & Voucher Printer
 
-A standalone, ultra-fast Cheque & Voucher Printing Web Application designed for **Wycherley International School (Org ID: `933829154`)** with direct Zoho Books API integration.
+A standalone, ultra-fast Cheque & Voucher Printing Web Application designed for **Wycherley International School (Org ID: `933829154`)** with direct Zoho Books API integration, ready for **Vercel**, **Netlify**, and **Local** deployment.
 
 ## 🚀 Key Features
 
@@ -28,35 +28,41 @@ A standalone, ultra-fast Cheque & Voucher Printing Web Application designed for 
 
 ---
 
+## ⚡ Vercel Deployment Guide
+
+1. **Import Git Repository to Vercel**:
+   - Repository: `https://github.com/vitharanasumithra718-design/wichaly-check-print`
+   - Framework Preset: **Other** (Root directory: `./`)
+
+2. **Add Environment Variables in Vercel** (`Project Settings → Environment Variables`):
+
+| Variable | Value | Description |
+|---|---|---|
+| `ZOHO_CLIENT_ID` | `1000.CUHQ2LAJ1531VTGLBU2XFFY62FD2WJ` | Your Zoho API Client ID |
+| `ZOHO_CLIENT_SECRET` | `636078052e431dd4d0cc2ff9eb8ef4a10d6288b6e2` | Your Zoho API Client Secret |
+| `ZOHO_ORG_ID` | `933829154` | Wycherley International School Org ID |
+| `ZOHO_REFRESH_TOKEN` | *(Your generated OAuth Refresh Token)* | Refresh token from Zoho OAuth |
+
+3. **Deploy** 🚀
+
+---
+
 ## 🔗 Zoho Books Custom Button URL Format
 
-In **Zoho Books** → **Settings** → **Customization** → **Buttons & Links**:
+In **Zoho Books** (Wycherley International School, Org: `933829154`) → **Settings** → **Customization** → **Buttons & Links**:
 
 ### 1. For Cheque Print Button:
 - **Button Type**: Open a Web Tab / Open a URL
 - **URL**:
   ```
-  https://<your-app-name>.netlify.app/?type=cheque&paymentID=${payment.payment_id}&organizationID=${organization.organization_id}
+  https://<your-project-name>.vercel.app/?type=cheque&paymentID=${payment.payment_id}&organizationID=933829154
   ```
 
 ### 2. For Payment Voucher Button:
 - **URL**:
   ```
-  https://<your-app-name>.netlify.app/?type=voucher&paymentID=${payment.payment_id}&organizationID=${organization.organization_id}
+  https://<your-project-name>.vercel.app/?type=voucher&paymentID=${payment.payment_id}&organizationID=933829154
   ```
-
----
-
-## ⚙️ Environment Variables (Netlify)
-
-Add these in **Netlify Site settings → Environment variables**:
-
-| Variable | Description |
-|---|---|
-| `ZOHO_CLIENT_ID` | Your Zoho API Client ID |
-| `ZOHO_CLIENT_SECRET` | Your Zoho API Client Secret |
-| `ZOHO_REFRESH_TOKEN` | Generated OAuth Refresh Token |
-| `ZOHO_ORG_ID` | `933829154` (Wycherley International School) |
 
 ---
 
