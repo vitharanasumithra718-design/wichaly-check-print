@@ -282,40 +282,42 @@
     /* Cheque Floating Elements with exact mm placements */
     .cq-date-box {
       position: absolute;
-      top: 5.5mm;
-      left: 128mm;
-      font-size: 18px;
-      letter-spacing: 1.5mm;
+      top: 7.5mm;
+      left: 135mm;
+      font-size: 14px;
       font-family: 'Space Mono', monospace;
-      font-weight: 700;
+      font-weight: 600;
       white-space: nowrap;
     }
     .cq-payee {
       position: absolute;
-      top: 20mm;
-      left: 22mm;
-      font-size: 14px;
-      font-weight: 700;
+      top: 22.5mm;
+      left: 24mm;
+      font-size: 13px;
+      font-weight: 600;
       text-transform: uppercase;
       white-space: nowrap;
+      letter-spacing: 0.2px;
     }
     .cq-words {
       position: absolute;
       top: 31mm;
-      left: 22mm;
-      width: 90mm;
-      font-size: 13.5px;
+      left: 24mm;
+      width: 105mm;
+      font-size: 12px;
       font-weight: 600;
-      line-height: 1.45;
+      line-height: 1.5;
+      letter-spacing: 0.1px;
     }
     .cq-amount-num {
       position: absolute;
-      top: 36mm;
-      right: 36mm;
-      font-size: 16px;
-      font-weight: 700;
+      top: 38mm;
+      right: 18mm;
+      font-size: 14.5px;
+      font-weight: 600;
       font-family: 'Space Mono', monospace;
       white-space: nowrap;
+      letter-spacing: 0.3px;
     }
 
     /* Crossing Graphics (Top-Left 2 Parallel Diagonal Lines & Text) */
@@ -651,6 +653,24 @@
           </div>
 
           <div class="ctrl-item">
+            <label>🔤 Weight:</label>
+            <select id="cqFontWeight" onchange="updateLiveCheque()" style="padding:3px 6px; font-size:12px; background:#0f172a; color:#fff; border:1px solid #475569; border-radius:6px;">
+              <option value="500">Normal (500)</option>
+              <option value="600" selected>Medium-Bold (600)</option>
+              <option value="700">Heavy Bold (700)</option>
+            </select>
+          </div>
+
+          <div class="ctrl-item">
+            <label>📏 Size:</label>
+            <select id="cqFontSizeScale" onchange="updateLiveCheque()" style="padding:3px 6px; font-size:12px; background:#0f172a; color:#fff; border:1px solid #475569; border-radius:6px;">
+              <option value="compact">Compact (-1px)</option>
+              <option value="standard" selected>Standard (Refined)</option>
+              <option value="large">Large (+1px)</option>
+            </select>
+          </div>
+
+          <div class="ctrl-item">
             <label><input type="checkbox" id="chkGuide" onchange="toggleGuide()"> 📏 Guide Grid</label>
           </div>
         </div>
@@ -965,12 +985,34 @@
     }
 
     function updateLiveCheque() {
+      const fw = document.getElementById('cqFontWeight')?.value || '600';
+      const scale = document.getElementById('cqFontSizeScale')?.value || 'standard';
+
+      let payeeSize = '13px';
+      let wordsSize = '12px';
+      let amtSize = '14.5px';
+      let dateSize = '14px';
+
+      if (scale === 'compact') {
+        payeeSize = '12px';
+        wordsSize = '11px';
+        amtSize = '13.5px';
+        dateSize = '13px';
+      } else if (scale === 'large') {
+        payeeSize = '14px';
+        wordsSize = '13px';
+        amtSize = '15.5px';
+        dateSize = '15px';
+      }
+
       // Payee
       const showPayee = document.getElementById('chkPayee').checked;
       const payeeVal = document.getElementById('cqPayeeInput').value;
       const payeeEl = document.getElementById('cqPayee');
       payeeEl.style.display = showPayee ? 'block' : 'none';
-      payeeEl.innerHTML = `<b>${escapeHtml(payeeVal)}</b>`;
+      payeeEl.style.fontSize = payeeSize;
+      payeeEl.style.fontWeight = fw;
+      payeeEl.textContent = payeeVal;
       document.getElementById('cfPayee').textContent = payeeVal;
 
       // Date
@@ -987,7 +1029,7 @@
         ? [d.d1, d.d2, d.m1, d.m2, d.y1, d.y2, d.y3, d.y4] 
         : [d.d1, d.d2, d.m1, d.m2, d.y3, d.y4];
 
-      dateEl.innerHTML = digits.map(dig => `<span style="display:inline-block; width:${spacing}mm; text-align:center; font-family:'Space Mono', monospace; font-weight:700; font-size:16px;">${dig !== undefined && dig !== '' ? dig : '&nbsp;'}</span>`).join('');
+      dateEl.innerHTML = digits.map(dig => `<span style="display:inline-block; width:${spacing}mm; text-align:center; font-family:'Space Mono', monospace; font-weight:${fw}; font-size:${dateSize};">${dig !== undefined && dig !== '' ? dig : '&nbsp;'}</span>`).join('');
       document.getElementById('cfDate').textContent = `${d.d1}${d.d2}/${d.m1}${d.m2}/${d.y1}${d.y2}${d.y3}${d.y4}`;
 
       // Amount (Words)
@@ -995,7 +1037,9 @@
       const wordsVal = document.getElementById('cqWordsInput').value;
       const wordsEl = document.getElementById('cqWords');
       wordsEl.style.display = showWords ? 'block' : 'none';
-      wordsEl.innerHTML = `<b>${escapeHtml(wordsVal)}</b>`;
+      wordsEl.style.fontSize = wordsSize;
+      wordsEl.style.fontWeight = fw;
+      wordsEl.textContent = wordsVal;
 
       // Amount (Num)
       const showAmt = document.getElementById('chkAmount').checked;
@@ -1003,7 +1047,9 @@
       const amtFmt = amtVal.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
       const amtEl = document.getElementById('cqAmountNum');
       amtEl.style.display = showAmt ? 'block' : 'none';
-      amtEl.innerHTML = `<b>${amtFmt}</b>`;
+      amtEl.style.fontSize = amtSize;
+      amtEl.style.fontWeight = fw;
+      amtEl.textContent = amtFmt;
       document.getElementById('cfAmt').textContent = amtFmt;
 
       // Crossing
