@@ -572,10 +572,10 @@
           <div class="ctrl-item">
             <label>🏦 Bank:</label>
             <select id="bankPreset" onchange="applyBankPreset(this.value)" style="min-width:170px;">
+              <option value="ntb" selected>Nations Trust Bank (NTB)</option>
               <option value="commercial">Commercial Bank</option>
               <option value="sampath">Sampath Bank</option>
-              <option value="ntb">Nations Trust Bank (NTB)</option>
-              <option value="hnb" selected>Hatton National Bank (HNB)</option>
+              <option value="hnb">Hatton National Bank (HNB)</option>
               <option value="boc">Bank of Ceylon (BOC)</option>
               <option value="seylan">Seylan Bank</option>
               <option value="custom">Custom Alignment</option>
@@ -585,6 +585,10 @@
           <div class="ctrl-item">
             <label><input type="checkbox" id="chkDate" checked onchange="updateLiveCheque()"> Date:</label>
             <input type="date" id="cqDateInput" onchange="onDateChange()">
+            <select id="cqDateFormat" onchange="updateLiveCheque()" style="font-size:12px; padding:4px 6px; background:#0f172a; color:#fff; border:1px solid #475569; border-radius:6px;">
+              <option value="8" selected>8 Digits (DD MM YYYY)</option>
+              <option value="6">6 Digits (DD MM YY)</option>
+            </select>
           </div>
 
           <div class="ctrl-item">
@@ -700,7 +704,7 @@
               <div class="cq-payee" id="cqPayee"><b>AP Holdings</b></div>
 
               <!-- Strike Or Bearer -->
-              <div class="cq-bearer-strike" id="cqBearerStrike"><s>OR BEARER</s></div>
+              <div class="cq-bearer-strike" id="cqBearerStrike" style="display:none;"><s>OR BEARER</s></div>
 
               <!-- Amount in Words -->
               <div class="cq-words" id="cqWords"><b>Eighteen and Cents Zero Only</b></div>
@@ -709,10 +713,10 @@
               <div class="cq-amount-num" id="cqAmountNum"><b>18.00</b></div>
 
               <!-- Company Label -->
-              <div class="cq-company" id="cqCompany">WYCHERLEY INTERNATIONAL SCHOOL</div>
+              <div class="cq-company" id="cqCompany" style="display:none;">WYCHERLEY INTERNATIONAL SCHOOL</div>
 
               <!-- Signatures -->
-              <div class="cq-signatures" id="cqSignatures">
+              <div class="cq-signatures" id="cqSignatures" style="display:none;">
                 <div class="cq-sig-block" id="sigBlock1">
                   <div class="cq-sig-line"></div>
                   <div class="cq-sig-label">Authorised Signatory</div>
@@ -758,14 +762,19 @@
 
           <!-- Date Alignment -->
           <div class="calib-group">
-            <div class="calib-header"><span>Date Box Position</span><span id="valDate">4.5, 126</span></div>
+            <div class="calib-header"><span>Date Box Position</span><span id="valDate">7.5, 135</span></div>
             <div class="calib-row">
-              <span style="width:28px;">Top:</span>
-              <input type="range" id="calDateTop" min="0" max="30" step="0.5" value="4.5" oninput="updateCalib()">
+              <span style="width:36px;">Top:</span>
+              <input type="range" id="calDateTop" min="0" max="40" step="0.5" value="7.5" oninput="updateCalib()">
             </div>
             <div class="calib-row">
-              <span style="width:28px;">Left:</span>
-              <input type="range" id="calDateLeft" min="80" max="170" step="0.5" value="126" oninput="updateCalib()">
+              <span style="width:36px;">Left:</span>
+              <input type="range" id="calDateLeft" min="80" max="180" step="0.5" value="135" oninput="updateCalib()">
+            </div>
+            <div class="calib-row">
+              <span style="width:36px;">Grid:</span>
+              <input type="range" id="calDateSpacing" min="3.5" max="7.0" step="0.1" value="4.8" oninput="updateCalib()">
+              <span id="valDateSpacing" style="font-size:10px; width:36px; text-align:right; font-family:monospace;">4.8mm</span>
             </div>
           </div>
 
@@ -866,12 +875,12 @@
 
     // Bank Calibration Presets
     const BANK_PRESETS = {
-      hnb: { dateTop: 4.5, dateLeft: 126, payeeTop: 19, payeeLeft: 22, wordsTop: 29, wordsLeft: 22, amtTop: 35, amtRight: 34 },
-      commercial: { dateTop: 5.5, dateLeft: 128, payeeTop: 20, payeeLeft: 22, wordsTop: 31, wordsLeft: 22, amtTop: 36, amtRight: 36 },
-      sampath: { dateTop: 3, dateLeft: 128, payeeTop: 18, payeeLeft: 22, wordsTop: 28, wordsLeft: 22, amtTop: 36, amtRight: 36 },
-      ntb: { dateTop: 5.5, dateLeft: 128, payeeTop: 20, payeeLeft: 22, wordsTop: 31, wordsLeft: 22, amtTop: 36, amtRight: 36 },
-      boc: { dateTop: 5, dateLeft: 127, payeeTop: 21, payeeLeft: 20, wordsTop: 32, wordsLeft: 20, amtTop: 37, amtRight: 35 },
-      seylan: { dateTop: 5.5, dateLeft: 128, payeeTop: 20, payeeLeft: 22, wordsTop: 30, wordsLeft: 22, amtTop: 36, amtRight: 36 }
+      ntb: { dateTop: 7.5, dateLeft: 135, dateSpacing: 4.8, dateFormat: "8", payeeTop: 22.5, payeeLeft: 24, wordsTop: 31, wordsLeft: 24, amtTop: 38, amtRight: 18, masterTop: 0, masterLeft: 0 },
+      commercial: { dateTop: 5.5, dateLeft: 128, dateSpacing: 4.8, dateFormat: "8", payeeTop: 20, payeeLeft: 22, wordsTop: 31, wordsLeft: 22, amtTop: 36, amtRight: 36, masterTop: 0, masterLeft: 0 },
+      sampath: { dateTop: 4.0, dateLeft: 128, dateSpacing: 4.8, dateFormat: "8", payeeTop: 19, payeeLeft: 22, wordsTop: 29, wordsLeft: 22, amtTop: 36, amtRight: 36, masterTop: 0, masterLeft: 0 },
+      hnb: { dateTop: 5.5, dateLeft: 128, dateSpacing: 4.8, dateFormat: "8", payeeTop: 20, payeeLeft: 22, wordsTop: 30, wordsLeft: 22, amtTop: 36, amtRight: 34, masterTop: 0, masterLeft: 0 },
+      boc: { dateTop: 5.0, dateLeft: 127, dateSpacing: 4.8, dateFormat: "8", payeeTop: 21, payeeLeft: 20, wordsTop: 32, wordsLeft: 20, amtTop: 37, amtRight: 35, masterTop: 0, masterLeft: 0 },
+      seylan: { dateTop: 5.5, dateLeft: 128, dateSpacing: 4.8, dateFormat: "8", payeeTop: 20, payeeLeft: 22, wordsTop: 30, wordsLeft: 22, amtTop: 36, amtRight: 36, masterTop: 0, masterLeft: 0 }
     };
 
     let currentRecord = {
@@ -966,10 +975,19 @@
 
       // Date
       const showDate = document.getElementById('chkDate').checked;
-      const d = currentRecord.dateDigits || { d1:'2', d2:'0', m1:'0', m2:'7', y1:'2', y2:'0', y3:'2', y4:'6' };
+      const d = currentRecord.dateDigits || { d1:'0', d2:'1', m1:'0', m2:'9', y1:'2', y2:'0', y3:'2', y4:'6' };
       const dateEl = document.getElementById('cqDateBox');
-      dateEl.style.display = showDate ? 'block' : 'none';
-      dateEl.innerHTML = `<b>${d.d1} ${d.d2} ${d.m1} ${d.m2}&nbsp;&nbsp;${d.y3} ${d.y4}</b>`;
+      dateEl.style.display = showDate ? 'flex' : 'none';
+      dateEl.style.alignItems = 'center';
+
+      const is8Digit = (document.getElementById('cqDateFormat')?.value || '8') !== '6';
+      const spacing = parseFloat(document.getElementById('calDateSpacing')?.value || 4.8);
+
+      const digits = is8Digit 
+        ? [d.d1, d.d2, d.m1, d.m2, d.y1, d.y2, d.y3, d.y4] 
+        : [d.d1, d.d2, d.m1, d.m2, d.y3, d.y4];
+
+      dateEl.innerHTML = digits.map(dig => `<span style="display:inline-block; width:${spacing}mm; text-align:center; font-family:'Space Mono', monospace; font-weight:700; font-size:16px;">${dig !== undefined && dig !== '' ? dig : '&nbsp;'}</span>`).join('');
       document.getElementById('cfDate').textContent = `${d.d1}${d.d2}/${d.m1}${d.m2}/${d.y1}${d.y2}${d.y3}${d.y4}`;
 
       // Amount (Words)
@@ -1058,6 +1076,7 @@
 
       const dTop = document.getElementById('calDateTop').value;
       const dLeft = document.getElementById('calDateLeft').value;
+      const dSpacing = document.getElementById('calDateSpacing')?.value || 4.8;
       const pTop = document.getElementById('calPayeeTop').value;
       const pLeft = document.getElementById('calPayeeLeft').value;
       const wTop = document.getElementById('calWordsTop').value;
@@ -1066,6 +1085,7 @@
       const aRight = document.getElementById('calAmtRight').value;
 
       document.getElementById('valDate').textContent = `${dTop}, ${dLeft}`;
+      if (document.getElementById('valDateSpacing')) document.getElementById('valDateSpacing').textContent = dSpacing + 'mm';
       document.getElementById('valPayee').textContent = `${pTop}, ${pLeft}`;
       document.getElementById('valWords').textContent = `${wTop}, ${wLeft}`;
       document.getElementById('valAmt').textContent = `${aTop}, ${aRight}`;
@@ -1085,17 +1105,20 @@
       const amtEl = document.getElementById('cqAmountNum');
       amtEl.style.top = aTop + 'mm';
       amtEl.style.right = aRight + 'mm';
+      updateLiveCheque();
     }
 
     function applyBankPreset(presetKey) {
       const saved = localStorage.getItem('pw_calib_' + presetKey);
-      let p = BANK_PRESETS[presetKey] || BANK_PRESETS.hnb;
+      let p = BANK_PRESETS[presetKey] || BANK_PRESETS.ntb;
       if (saved) {
         try { p = { ...p, ...JSON.parse(saved) }; } catch (_) {}
       }
 
       if (document.getElementById('calMasterTop')) document.getElementById('calMasterTop').value = p.masterTop || 0;
       if (document.getElementById('calMasterLeft')) document.getElementById('calMasterLeft').value = p.masterLeft || 0;
+      if (document.getElementById('calDateSpacing')) document.getElementById('calDateSpacing').value = p.dateSpacing || 4.8;
+      if (document.getElementById('cqDateFormat')) document.getElementById('cqDateFormat').value = p.dateFormat || '8';
       document.getElementById('calDateTop').value = p.dateTop;
       document.getElementById('calDateLeft').value = p.dateLeft;
       document.getElementById('calPayeeTop').value = p.payeeTop;
@@ -1108,12 +1131,12 @@
     }
 
     function resetCalibration() {
-      applyBankPreset('hnb');
-      document.getElementById('bankPreset').value = 'hnb';
+      applyBankPreset('ntb');
+      document.getElementById('bankPreset').value = 'ntb';
       if (document.getElementById('calMasterTop')) document.getElementById('calMasterTop').value = 0;
       if (document.getElementById('calMasterLeft')) document.getElementById('calMasterLeft').value = 0;
       updateCalib();
-      toast('Reset to HNB preset');
+      toast('Reset to NTB preset');
     }
 
     function saveBankProfile() {
@@ -1123,6 +1146,8 @@
         masterLeft: document.getElementById('calMasterLeft')?.value || 0,
         dateTop: document.getElementById('calDateTop').value,
         dateLeft: document.getElementById('calDateLeft').value,
+        dateSpacing: document.getElementById('calDateSpacing')?.value || 4.8,
+        dateFormat: document.getElementById('cqDateFormat')?.value || '8',
         payeeTop: document.getElementById('calPayeeTop').value,
         payeeLeft: document.getElementById('calPayeeLeft').value,
         wordsTop: document.getElementById('calWordsTop').value,
@@ -1338,7 +1363,7 @@
 
     // Set today date by default
     document.getElementById('cqDateInput').value = new Date().toISOString().slice(0, 10);
-    applyBankPreset('hnb');
+    applyBankPreset('ntb');
     updateLiveCheque();
     checkAuth();
     initFromUrlParams();
