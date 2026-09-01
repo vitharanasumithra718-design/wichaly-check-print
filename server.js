@@ -1,4 +1,4 @@
-// server.js - Lightweight local server for PW Holdings Cheque Printer
+// server.js - Lightweight local server for Wycherley International School Cheque Printer
 const http = require("http");
 const fs = require("fs");
 const path = require("path");
@@ -9,7 +9,6 @@ const functions = {
   "/get-record": require("./netlify/functions/get-record").handler,
   "/oauthStart": require("./netlify/functions/oauthStart").handler,
   "/oauthCallback": require("./netlify/functions/oauthCallback").handler,
-  "/zohoAuth": require("./netlify/functions/zohoAuth"),
 };
 
 const server = http.createServer(async (req, res) => {
@@ -67,7 +66,7 @@ const server = http.createServer(async (req, res) => {
 
 server.listen(PORT, () => {
   console.log(`\n======================================================`);
-  console.log(`🚀 PW Holdings Cheque Printer Running at:`);
+  console.log(`🚀 Wycherley International School Cheque Printer Running at:`);
   console.log(`👉 http://localhost:${PORT}`);
   console.log(`======================================================\n`);
   

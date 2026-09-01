@@ -1,6 +1,6 @@
-# P W Holdings — Cheque & Voucher Printer
+# Wycherley International School — Cheque & Voucher Printer
 
-A standalone, ultra-fast Cheque & Voucher Printing Web Application designed for **P W Holdings (Org ID: `918798701`)** with direct Zoho Books API integration.
+A standalone, ultra-fast Cheque & Voucher Printing Web Application designed for **Wycherley International School (Org ID: `933829154`)** with direct Zoho Books API integration.
 
 ## 🚀 Key Features
 
@@ -56,14 +56,18 @@ Add these in **Netlify Site settings → Environment variables**:
 | `ZOHO_CLIENT_ID` | Your Zoho API Client ID |
 | `ZOHO_CLIENT_SECRET` | Your Zoho API Client Secret |
 | `ZOHO_REFRESH_TOKEN` | Generated OAuth Refresh Token |
-| `ZOHO_ORG_ID` | `918798701` (P W Holdings) |
+| `ZOHO_ORG_ID` | `933829154` (Wycherley International School) |
 
 ---
 
 ## 💻 Local Development
 
-Run with Netlify CLI:
+1. Run with standard Node.js:
 ```bash
-netlify dev
+start.bat
+```
+or
+```bash
+node server.js
 ```
 Open `http://localhost:8888` in your browser.

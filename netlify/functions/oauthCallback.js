@@ -65,7 +65,7 @@ exports.handler = async function (event) {
   <div class="card">
     <div style="font-size:48px; margin-bottom:12px;">✅</div>
     <h2>Zoho Books Connected Successfully!</h2>
-    <p>Your <strong>P W Holdings</strong> Zoho Books organization is now connected to the Cheque & Voucher Printer.</p>
+    <p>Your <strong>Wycherley International School</strong> Zoho Books organization is now connected to the Cheque & Voucher Printer.</p>
     <div class="token-box">
       <label>ZOHO_REFRESH_TOKEN</label>
       <code id="rt">${data.refresh_token}</code>

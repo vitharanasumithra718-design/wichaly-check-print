@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>P W Holdings — Intelligent Cheque Writer & Printer</title>
+  <title>Wycherley International School — Intelligent Cheque Writer & Printer</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Mono:wght@400;700&family=Courier+Prime:wght@400;700&display=swap" rel="stylesheet">
   <style>
@@ -497,10 +497,10 @@
 
   <header class="app-nav no-print">
     <div class="brand-group">
-      <div class="brand-logo">PW</div>
+      <div class="brand-logo">WIS</div>
       <div>
-        <div class="brand-title">P W Holdings — Cheque Writer</div>
-        <div class="brand-sub">Auto-fill &amp; 1-Click Print Engine (Org: 918798701)</div>
+        <div class="brand-title">Wycherley International School — Cheque Writer</div>
+        <div class="brand-sub">Auto-fill &amp; 1-Click Print Engine (Org: 933829154)</div>
       </div>
     </div>
 
@@ -598,7 +598,7 @@
 
           <div class="ctrl-item">
             <label><input type="checkbox" id="chkCompany" onchange="updateLiveCheque()"> 🏢 Company Label</label>
-            <input type="text" id="cqCompanyInput" value="PW HOLDINGS (PVT) LTD" oninput="updateLiveCheque()" style="width:180px; padding:3px 6px; font-size:12px; font-weight:700;">
+            <input type="text" id="cqCompanyInput" value="WYCHERLEY INTERNATIONAL SCHOOL" oninput="updateLiveCheque()" style="width:230px; padding:3px 6px; font-size:12px; font-weight:700;">
           </div>
 
           <div class="ctrl-item">
@@ -648,7 +648,7 @@
                   <div class="cf-val" id="cfAmt">18.00</div>
                 </div>
               </div>
-              <div style="font-size:9px; color:#64748b; text-align:center; font-weight:bold;">P W HOLDINGS (PVT) LTD</div>
+              <div style="font-size:9px; color:#64748b; text-align:center; font-weight:bold;">WYCHERLEY INTERNATIONAL SCHOOL</div>
             </div>
 
             <!-- Main Cheque Paper Area (7.5" x 3.875") -->
@@ -676,7 +676,7 @@
               <div class="cq-amount-num" id="cqAmountNum"><b>18.00</b></div>
 
               <!-- Company Label -->
-              <div class="cq-company" id="cqCompany">PW HOLDINGS (PVT) LTD</div>
+              <div class="cq-company" id="cqCompany">WYCHERLEY INTERNATIONAL SCHOOL</div>
 
               <!-- Signatures -->
               <div class="cq-signatures" id="cqSignatures">
@@ -767,7 +767,7 @@
     <div class="app-view" id="view-lookup">
       <div class="cheque-control-box">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
-          <h3 style="margin:0;">Select Payment from Zoho Books (Org: 918798701)</h3>
+          <h3 style="margin:0;">Select Payment from Zoho Books (Org: 933829154)</h3>
           <button class="btn btn-primary btn-sm" onclick="loadRecentPayments()">🔄 Refresh Payments</button>
         </div>
         <div id="paymentsListContainer">
@@ -784,11 +784,11 @@
         <h3>⚙️ Zoho Books Configuration</h3>
         <div style="margin-bottom:14px;">
           <label style="font-size:12px; font-weight:700; color:var(--text-muted); display:block; margin-bottom:4px;">Organization ID</label>
-          <input type="text" id="cfgOrgId" value="918798701" style="width:100%; background:#0f172a; border:1px solid #334155; padding:8px 12px; color:#fff; border-radius:6px;">
+          <input type="text" id="cfgOrgId" value="933829154" style="width:100%; background:#0f172a; border:1px solid #334155; padding:8px 12px; color:#fff; border-radius:6px;">
         </div>
         <div style="margin-bottom:14px;">
           <label style="font-size:12px; font-weight:700; color:var(--text-muted); display:block; margin-bottom:4px;">Default Company Label on Cheque</label>
-          <input type="text" id="cfgCompanyName" value="PW HOLDINGS (PVT) LTD" style="width:100%; background:#0f172a; border:1px solid #334155; padding:8px 12px; color:#fff; border-radius:6px; font-weight:700;">
+          <input type="text" id="cfgCompanyName" value="WYCHERLEY INTERNATIONAL SCHOOL" style="width:100%; background:#0f172a; border:1px solid #334155; padding:8px 12px; color:#fff; border-radius:6px; font-weight:700;">
         </div>
         <div style="margin-top:20px;">
           <button class="btn btn-primary" onclick="startOAuth()">Connect with Zoho Books</button>
@@ -1081,7 +1081,7 @@
       const params = new URLSearchParams(window.location.search);
       const paymentId = params.get('paymentID') || params.get('id');
       const expenseId = params.get('expenseID');
-      const orgId = params.get('organizationID') || params.get('orgId') || '918798701';
+      const orgId = params.get('organizationID') || params.get('orgId') || '933829154';
       const type = params.get('type') || (expenseId ? 'expense' : 'vendorpayment');
 
       const id = paymentId || expenseId;
