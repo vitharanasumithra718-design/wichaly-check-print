@@ -361,6 +361,19 @@
       white-space: nowrap;
     }
 
+    /* Ahead of Date Crossing (Top Header) */
+    .cq-ahead-date {
+      position: absolute;
+      top: 7.5mm;
+      left: 88mm;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      font-family: 'Space Mono', monospace, sans-serif;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+
     /* Or Bearer Strikethrough */
     .cq-bearer-strike {
       position: absolute;
@@ -588,19 +601,22 @@
             <label><input type="checkbox" id="chkDate" checked onchange="updateLiveCheque()"> Date:</label>
             <input type="date" id="cqDateInput" onchange="onDateChange()">
             <select id="cqDateFormat" onchange="updateLiveCheque()" style="font-size:12px; padding:4px 6px; background:#0f172a; color:#fff; border:1px solid #475569; border-radius:6px;">
-              <option value="8" selected>8 Digits (DD MM YYYY)</option>
+              <option value="ntb_20" selected>DD MM [20] YY (NTB Pre-printed 20)</option>
+              <option value="8">8 Digits (DD MM YYYY)</option>
               <option value="6">6 Digits (DD MM YY)</option>
             </select>
           </div>
 
           <div class="ctrl-item">
             <label>Crossing Mode:</label>
-            <select id="cqCrossingSelect" onchange="updateLiveCheque()" style="min-width:200px;">
-              <option value="cross_ac_payee">Cross A/C Payee (// Top-Left)</option>
+            <select id="cqCrossingSelect" onchange="updateLiveCheque()" style="min-width:230px;">
+              <option value="ahead_date_ac" selected>// ACCOUNT PAYEE ONLY // (Ahead of Date)</option>
+              <option value="ahead_date_plain">ACCOUNT PAYEE ONLY (Ahead of Date)</option>
+              <option value="cross_ac_payee">Cross A/C Payee (// Top-Left Corner)</option>
               <option value="cross_ac_not_negotiable">Cross A/C Payee + Not Negotiable</option>
               <option value="cross_only">Cross Only (// Parallel Lines)</option>
               <option value="center_ac_payee">Center Banner (A/C PAYEE ONLY)</option>
-              <option value="no_crossing" selected>No Crossing (Bearer Cheque)</option>
+              <option value="no_crossing">No Crossing (Bearer Cheque)</option>
             </select>
           </div>
 
@@ -714,6 +730,9 @@
               <!-- Date Box -->
               <div class="cq-date-box" id="cqDateBox"><b>2 0 0 7 2 6</b></div>
 
+              <!-- Ahead of Date Crossing -->
+              <div class="cq-ahead-date" id="cqAheadDate" style="display:none;">// ACCOUNT PAYEE ONLY //</div>
+
               <!-- Crossing Graphics -->
               <div class="cq-crossing-box cross-lines" id="cqCrossingLines">
                 <div class="cq-crossing-text" id="cqCrossingLineText">A/C PAYEE ONLY</div>
@@ -782,19 +801,32 @@
 
           <!-- Date Alignment -->
           <div class="calib-group">
-            <div class="calib-header"><span>Date Box Position</span><span id="valDate">7.5, 135</span></div>
+            <div class="calib-header"><span>Date Box Position</span><span id="valDate">7.5, 135.5</span></div>
             <div class="calib-row">
               <span style="width:36px;">Top:</span>
               <input type="range" id="calDateTop" min="0" max="40" step="0.5" value="7.5" oninput="updateCalib()">
             </div>
             <div class="calib-row">
               <span style="width:36px;">Left:</span>
-              <input type="range" id="calDateLeft" min="80" max="180" step="0.5" value="135" oninput="updateCalib()">
+              <input type="range" id="calDateLeft" min="80" max="180" step="0.5" value="135.5" oninput="updateCalib()">
             </div>
             <div class="calib-row">
               <span style="width:36px;">Grid:</span>
-              <input type="range" id="calDateSpacing" min="3.5" max="7.0" step="0.1" value="4.8" oninput="updateCalib()">
-              <span id="valDateSpacing" style="font-size:10px; width:36px; text-align:right; font-family:monospace;">4.8mm</span>
+              <input type="range" id="calDateSpacing" min="3.0" max="6.5" step="0.05" value="3.95" oninput="updateCalib()">
+              <span id="valDateSpacing" style="font-size:10px; width:44px; text-align:right; font-family:monospace;">3.95mm</span>
+            </div>
+          </div>
+
+          <!-- Ahead-Date Crossing Alignment -->
+          <div class="calib-group">
+            <div class="calib-header"><span>Ahead-Date Crossing</span><span id="valCross">7.5, 88</span></div>
+            <div class="calib-row">
+              <span style="width:36px;">Top:</span>
+              <input type="range" id="calCrossTop" min="0" max="30" step="0.5" value="7.5" oninput="updateCalib()">
+            </div>
+            <div class="calib-row">
+              <span style="width:36px;">Left:</span>
+              <input type="range" id="calCrossLeft" min="40" max="140" step="0.5" value="88" oninput="updateCalib()">
             </div>
           </div>
 
@@ -895,12 +927,12 @@
 
     // Bank Calibration Presets
     const BANK_PRESETS = {
-      ntb: { dateTop: 7.5, dateLeft: 135, dateSpacing: 4.8, dateFormat: "8", payeeTop: 22.5, payeeLeft: 24, wordsTop: 31, wordsLeft: 24, amtTop: 38, amtRight: 18, masterTop: 0, masterLeft: 0 },
-      commercial: { dateTop: 5.5, dateLeft: 128, dateSpacing: 4.8, dateFormat: "8", payeeTop: 20, payeeLeft: 22, wordsTop: 31, wordsLeft: 22, amtTop: 36, amtRight: 36, masterTop: 0, masterLeft: 0 },
-      sampath: { dateTop: 4.0, dateLeft: 128, dateSpacing: 4.8, dateFormat: "8", payeeTop: 19, payeeLeft: 22, wordsTop: 29, wordsLeft: 22, amtTop: 36, amtRight: 36, masterTop: 0, masterLeft: 0 },
-      hnb: { dateTop: 5.5, dateLeft: 128, dateSpacing: 4.8, dateFormat: "8", payeeTop: 20, payeeLeft: 22, wordsTop: 30, wordsLeft: 22, amtTop: 36, amtRight: 34, masterTop: 0, masterLeft: 0 },
-      boc: { dateTop: 5.0, dateLeft: 127, dateSpacing: 4.8, dateFormat: "8", payeeTop: 21, payeeLeft: 20, wordsTop: 32, wordsLeft: 20, amtTop: 37, amtRight: 35, masterTop: 0, masterLeft: 0 },
-      seylan: { dateTop: 5.5, dateLeft: 128, dateSpacing: 4.8, dateFormat: "8", payeeTop: 20, payeeLeft: 22, wordsTop: 30, wordsLeft: 22, amtTop: 36, amtRight: 36, masterTop: 0, masterLeft: 0 }
+      ntb: { dateTop: 7.5, dateLeft: 135.5, dateSpacing: 3.95, dateFormat: "ntb_20", crossingMode: "ahead_date_ac", crossTop: 7.5, crossLeft: 88, payeeTop: 22.5, payeeLeft: 24, wordsTop: 31, wordsLeft: 24, amtTop: 38, amtRight: 18, masterTop: 0, masterLeft: 0 },
+      commercial: { dateTop: 5.5, dateLeft: 128, dateSpacing: 4.8, dateFormat: "8", crossingMode: "cross_ac_payee", crossTop: 7.5, crossLeft: 88, payeeTop: 20, payeeLeft: 22, wordsTop: 31, wordsLeft: 22, amtTop: 36, amtRight: 36, masterTop: 0, masterLeft: 0 },
+      sampath: { dateTop: 4.0, dateLeft: 128, dateSpacing: 4.8, dateFormat: "8", crossingMode: "cross_ac_payee", crossTop: 7.5, crossLeft: 88, payeeTop: 19, payeeLeft: 22, wordsTop: 29, wordsLeft: 22, amtTop: 36, amtRight: 36, masterTop: 0, masterLeft: 0 },
+      hnb: { dateTop: 5.5, dateLeft: 128, dateSpacing: 4.8, dateFormat: "8", crossingMode: "cross_ac_payee", crossTop: 7.5, crossLeft: 88, payeeTop: 20, payeeLeft: 22, wordsTop: 30, wordsLeft: 22, amtTop: 36, amtRight: 34, masterTop: 0, masterLeft: 0 },
+      boc: { dateTop: 5.0, dateLeft: 127, dateSpacing: 4.8, dateFormat: "8", crossingMode: "cross_ac_payee", crossTop: 7.5, crossLeft: 88, payeeTop: 21, payeeLeft: 20, wordsTop: 32, wordsLeft: 20, amtTop: 37, amtRight: 35, masterTop: 0, masterLeft: 0 },
+      seylan: { dateTop: 5.5, dateLeft: 128, dateSpacing: 4.8, dateFormat: "8", crossingMode: "cross_ac_payee", crossTop: 7.5, crossLeft: 88, payeeTop: 20, payeeLeft: 22, wordsTop: 30, wordsLeft: 22, amtTop: 36, amtRight: 36, masterTop: 0, masterLeft: 0 }
     };
 
     let currentRecord = {
@@ -1022,12 +1054,18 @@
       dateEl.style.display = showDate ? 'flex' : 'none';
       dateEl.style.alignItems = 'center';
 
-      const is8Digit = (document.getElementById('cqDateFormat')?.value || '8') !== '6';
-      const spacing = parseFloat(document.getElementById('calDateSpacing')?.value || 4.8);
+      const fmt = document.getElementById('cqDateFormat')?.value || 'ntb_20';
+      const spacing = parseFloat(document.getElementById('calDateSpacing')?.value || 3.95);
 
-      const digits = is8Digit 
-        ? [d.d1, d.d2, d.m1, d.m2, d.y1, d.y2, d.y3, d.y4] 
-        : [d.d1, d.d2, d.m1, d.m2, d.y3, d.y4];
+      let digits = [];
+      if (fmt === 'ntb_20') {
+        // Pre-printed '2 0' in boxes 5 and 6 on NTB cheques
+        digits = [d.d1, d.d2, d.m1, d.m2, '', '', d.y3, d.y4];
+      } else if (fmt === '6') {
+        digits = [d.d1, d.d2, d.m1, d.m2, d.y3, d.y4];
+      } else {
+        digits = [d.d1, d.d2, d.m1, d.m2, d.y1, d.y2, d.y3, d.y4];
+      }
 
       dateEl.innerHTML = digits.map(dig => `<span style="display:inline-block; width:${spacing}mm; text-align:center; font-family:'Space Mono', monospace; font-weight:${fw}; font-size:${dateSize};">${dig !== undefined && dig !== '' ? dig : '&nbsp;'}</span>`).join('');
       document.getElementById('cfDate').textContent = `${d.d1}${d.d2}/${d.m1}${d.m2}/${d.y1}${d.y2}${d.y3}${d.y4}`;
@@ -1057,11 +1095,25 @@
       const linesEl = document.getElementById('cqCrossingLines');
       const linesText = document.getElementById('cqCrossingLineText');
       const centerEl = document.getElementById('cqAcCenter');
+      const aheadEl = document.getElementById('cqAheadDate');
 
       linesEl.style.display = 'none';
       centerEl.style.display = 'none';
+      if (aheadEl) aheadEl.style.display = 'none';
 
-      if (crossingMode === 'cross_ac_payee') {
+      if (crossingMode === 'ahead_date_ac') {
+        if (aheadEl) {
+          aheadEl.style.display = 'block';
+          aheadEl.textContent = '// ACCOUNT PAYEE ONLY //';
+          aheadEl.style.fontWeight = fw === '500' ? '600' : '700';
+        }
+      } else if (crossingMode === 'ahead_date_plain') {
+        if (aheadEl) {
+          aheadEl.style.display = 'block';
+          aheadEl.textContent = 'ACCOUNT PAYEE ONLY';
+          aheadEl.style.fontWeight = fw === '500' ? '600' : '700';
+        }
+      } else if (crossingMode === 'cross_ac_payee') {
         linesEl.style.display = 'flex';
         linesText.textContent = 'A/C PAYEE ONLY';
       } else if (crossingMode === 'cross_ac_not_negotiable') {
@@ -1122,7 +1174,9 @@
 
       const dTop = document.getElementById('calDateTop').value;
       const dLeft = document.getElementById('calDateLeft').value;
-      const dSpacing = document.getElementById('calDateSpacing')?.value || 4.8;
+      const dSpacing = document.getElementById('calDateSpacing')?.value || 3.95;
+      const cTop = document.getElementById('calCrossTop')?.value || 7.5;
+      const cLeft = document.getElementById('calCrossLeft')?.value || 88;
       const pTop = document.getElementById('calPayeeTop').value;
       const pLeft = document.getElementById('calPayeeLeft').value;
       const wTop = document.getElementById('calWordsTop').value;
@@ -1132,6 +1186,7 @@
 
       document.getElementById('valDate').textContent = `${dTop}, ${dLeft}`;
       if (document.getElementById('valDateSpacing')) document.getElementById('valDateSpacing').textContent = dSpacing + 'mm';
+      if (document.getElementById('valCross')) document.getElementById('valCross').textContent = `${cTop}, ${cLeft}`;
       document.getElementById('valPayee').textContent = `${pTop}, ${pLeft}`;
       document.getElementById('valWords').textContent = `${wTop}, ${wLeft}`;
       document.getElementById('valAmt').textContent = `${aTop}, ${aRight}`;
@@ -1139,6 +1194,12 @@
       const dateEl = document.getElementById('cqDateBox');
       dateEl.style.top = dTop + 'mm';
       dateEl.style.left = dLeft + 'mm';
+
+      const aheadEl = document.getElementById('cqAheadDate');
+      if (aheadEl) {
+        aheadEl.style.top = cTop + 'mm';
+        aheadEl.style.left = cLeft + 'mm';
+      }
 
       const payeeEl = document.getElementById('cqPayee');
       payeeEl.style.top = pTop + 'mm';
@@ -1163,8 +1224,11 @@
 
       if (document.getElementById('calMasterTop')) document.getElementById('calMasterTop').value = p.masterTop || 0;
       if (document.getElementById('calMasterLeft')) document.getElementById('calMasterLeft').value = p.masterLeft || 0;
-      if (document.getElementById('calDateSpacing')) document.getElementById('calDateSpacing').value = p.dateSpacing || 4.8;
-      if (document.getElementById('cqDateFormat')) document.getElementById('cqDateFormat').value = p.dateFormat || '8';
+      if (document.getElementById('calDateSpacing')) document.getElementById('calDateSpacing').value = p.dateSpacing || 3.95;
+      if (document.getElementById('cqDateFormat')) document.getElementById('cqDateFormat').value = p.dateFormat || 'ntb_20';
+      if (document.getElementById('cqCrossingSelect')) document.getElementById('cqCrossingSelect').value = p.crossingMode || 'ahead_date_ac';
+      if (document.getElementById('calCrossTop')) document.getElementById('calCrossTop').value = p.crossTop || 7.5;
+      if (document.getElementById('calCrossLeft')) document.getElementById('calCrossLeft').value = p.crossLeft || 88;
       document.getElementById('calDateTop').value = p.dateTop;
       document.getElementById('calDateLeft').value = p.dateLeft;
       document.getElementById('calPayeeTop').value = p.payeeTop;
@@ -1192,8 +1256,11 @@
         masterLeft: document.getElementById('calMasterLeft')?.value || 0,
         dateTop: document.getElementById('calDateTop').value,
         dateLeft: document.getElementById('calDateLeft').value,
-        dateSpacing: document.getElementById('calDateSpacing')?.value || 4.8,
-        dateFormat: document.getElementById('cqDateFormat')?.value || '8',
+        dateSpacing: document.getElementById('calDateSpacing')?.value || 3.95,
+        dateFormat: document.getElementById('cqDateFormat')?.value || 'ntb_20',
+        crossingMode: document.getElementById('cqCrossingSelect')?.value || 'ahead_date_ac',
+        crossTop: document.getElementById('calCrossTop')?.value || 7.5,
+        crossLeft: document.getElementById('calCrossLeft')?.value || 88,
         payeeTop: document.getElementById('calPayeeTop').value,
         payeeLeft: document.getElementById('calPayeeLeft').value,
         wordsTop: document.getElementById('calWordsTop').value,
