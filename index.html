@@ -288,7 +288,7 @@
       align-items: center;
       gap: 0.8mm;
       font-family: 'Space Mono', monospace;
-      font-weight: 700;
+      font-weight: 500;
       white-space: nowrap;
       line-height: 1;
     }
@@ -300,6 +300,7 @@
       text-align: center;
       font-size: 13.5px;
       line-height: 1;
+      font-weight: 500;
     }
     .cq-date-box.skip-20 .d-century {
       visibility: hidden !important;
@@ -311,10 +312,11 @@
       position: absolute;
       top: 20mm;
       left: 22mm;
-      font-size: 14px;
-      font-weight: 700;
-      text-transform: uppercase;
+      font-size: 13.5px;
+      font-weight: 500;
+      text-transform: none; /* Allows Sentence Case / Title Case */
       white-space: nowrap;
+      color: #000;
     }
     .cq-words {
       position: absolute;
@@ -322,17 +324,27 @@
       left: 22mm;
       width: 90mm;
       font-size: 13.5px;
-      font-weight: 600;
+      font-weight: 500;
       line-height: 1.45;
+      color: #000;
     }
     .cq-amount-num {
       position: absolute;
       top: 36mm;
       right: 36mm;
-      font-size: 16px;
-      font-weight: 700;
+      font-size: 15.5px;
+      font-weight: 500;
       font-family: 'Space Mono', monospace;
       white-space: nowrap;
+      color: #000;
+    }
+
+    /* Optional Bold Mode (Toggleable via Extra Options) */
+    .cheque-paper.bold-mode .cq-payee,
+    .cheque-paper.bold-mode .cq-words,
+    .cheque-paper.bold-mode .cq-amount-num,
+    .cheque-paper.bold-mode .cq-date-box .d-cell {
+      font-weight: 700 !important;
     }
 
     /* Crossing Graphics (Top-Left 2 Parallel Diagonal Lines & Text) */
@@ -464,13 +476,13 @@
        PRINT RULES (PERFECT ZERO MARGIN CHEQUE PRINT)
        ========================================================================= */
     @page {
-      size: auto;
+      size: landscape;
       margin: 0mm !important;
     }
 
     @media print {
       @page {
-        size: auto;
+        size: landscape;
         margin: 0mm !important;
       }
       body, html {
@@ -626,27 +638,42 @@
         </div>
 
         <!-- Row 2: Payee, Amount (Numeric), Wording -->
-        <div class="cq-toolbar-row">
-          <div class="ctrl-item" style="flex:1; min-width:240px;">
+        <div class="cq-toolbar-row" style="flex-wrap:wrap; gap:10px;">
+          <div class="ctrl-item" style="flex:1; min-width:260px;">
             <label><input type="checkbox" id="chkPayee" checked onchange="updateLiveCheque()"> Payee:</label>
-            <input type="text" id="cqPayeeInput" value="CHILL AIR AUTO A/C (Pvt) Ltd" placeholder="Payee name" oninput="updateLiveCheque()" style="width:100%;">
+            <input type="text" id="cqPayeeInput" value="Chill Air Auto A/C (Pvt) Ltd" placeholder="Payee name" oninput="updateLiveCheque()" style="width:100%;">
+            <select id="cqPayeeCase" onchange="updateLiveCheque()" style="font-size:11.5px; padding:4px 6px; font-weight:600; background:#0f172a; color:#38bdf8; border:1px solid #334155; border-radius:6px;" title="Text Case">
+              <option value="sentence" selected>Sentence Case (Chill air...)</option>
+              <option value="title">Title Case (Chill Air...)</option>
+              <option value="as_is">As Typed / Original</option>
+              <option value="upper">UPPERCASE (ALL CAPS)</option>
+            </select>
           </div>
 
           <div class="ctrl-item">
             <label><input type="checkbox" id="chkAmount" checked onchange="updateLiveCheque()"> Amount (Rs):</label>
-            <input type="number" step="0.01" id="cqAmountInput" value="18.00" oninput="onAmountChange()" style="width:130px; font-weight:700;">
+            <input type="number" step="0.01" id="cqAmountInput" value="1234567.00" oninput="onAmountChange()" style="width:140px; font-weight:700;">
           </div>
 
-          <div class="ctrl-item">
+          <div class="ctrl-item" style="flex:1.4; min-width:320px;">
             <label><input type="checkbox" id="chkWords" checked onchange="updateLiveCheque()"> Words:</label>
-            <input type="text" id="cqWordsInput" value="Eighteen and Cents Zero Only" oninput="updateLiveCheque()" style="min-width:320px; font-weight:600;">
+            <input type="text" id="cqWordsInput" value="Twelve lakh thirty four thousand five hundred and sixty seven and cents zero only" oninput="updateLiveCheque()" style="width:100%; font-weight:600;">
+            <select id="cqWordsCase" onchange="updateLiveCheque()" style="font-size:11.5px; padding:4px 6px; font-weight:600; background:#0f172a; color:#38bdf8; border:1px solid #334155; border-radius:6px;" title="Words Case">
+              <option value="sentence" selected>Sentence Case</option>
+              <option value="title">Title Case</option>
+              <option value="upper">UPPERCASE</option>
+            </select>
           </div>
         </div>
 
         <!-- Row 3: Optional Toggles (Counterfoil / Stub, Signatures, Company, Bearer) -->
-        <div class="cq-toolbar-row" style="background:#0f172a; padding:8px 12px; border-radius:8px; border:1px solid #334155;">
+        <div class="cq-toolbar-row" style="background:#0f172a; padding:8px 12px; border-radius:8px; border:1px solid #334155; flex-wrap:wrap; gap:12px;">
           <span style="font-size:11.5px; font-weight:700; color:#38bdf8; text-transform:uppercase; margin-right:4px;">Extra Options:</span>
           
+          <div class="ctrl-item">
+            <label><input type="checkbox" id="chkBold" onchange="updateLiveCheque()"> 🔤 Bold Font</label>
+          </div>
+
           <div class="ctrl-item">
             <label><input type="checkbox" id="chkCounterfoil" onchange="toggleCounterfoil()"> 📋 Counterfoil / Stub (Left)</label>
           </div>
@@ -934,12 +961,12 @@
     };
 
     let currentRecord = {
-      payeeName: 'CHILL AIR AUTO A/C (Pvt) Ltd',
+      payeeName: 'Chill Air Auto A/C (Pvt) Ltd',
       dateDigits: { d1: '0', d2: '1', m1: '0', m2: '9', y1: '2', y2: '0', y3: '2', y4: '6' },
       date: '2026-09-01',
       amount: 1234567.00,
       amountFormatted: '1,234,567.00',
-      amountInWords: 'Twelve Lakh Thirty Four Thousand Five Hundred and Sixty Seven and Cents Zero Only',
+      amountInWords: 'Twelve lakh thirty four thousand five hundred and sixty seven and cents zero only',
       paymentNumber: '1001'
     };
 
@@ -957,6 +984,22 @@
       if (targetView) targetView.classList.add('active');
       const targetBtn = document.querySelector(`.nav-tabs button[onclick*="${viewName}"]`);
       if (targetBtn) targetBtn.classList.add('active');
+    }
+
+    function applyTextCase(text, caseType) {
+      if (!text) return '';
+      const t = String(text).trim();
+      if (caseType === 'sentence') {
+        return t.charAt(0).toUpperCase() + t.slice(1).toLowerCase();
+      } else if (caseType === 'title') {
+        return t.toLowerCase().split(' ').map(w => {
+          if (!w) return '';
+          return w.charAt(0).toUpperCase() + w.slice(1);
+        }).join(' ');
+      } else if (caseType === 'upper') {
+        return t.toUpperCase();
+      }
+      return t; // as_is
     }
 
     function numberToWords(num) {
@@ -987,7 +1030,9 @@
       const amt = parseFloat(document.getElementById('cqAmountInput').value) || 0;
       currentRecord.amount = amt;
       currentRecord.amountFormatted = amt.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-      currentRecord.amountInWords = numberToWords(amt);
+      const rawWords = numberToWords(amt);
+      const wordsCase = document.getElementById('cqWordsCase')?.value || 'sentence';
+      currentRecord.amountInWords = applyTextCase(rawWords, wordsCase);
       document.getElementById('cqWordsInput').value = currentRecord.amountInWords;
       updateLiveCheque();
     }
@@ -1015,12 +1060,22 @@
     }
 
     function updateLiveCheque() {
+      // Bold Mode Toggle
+      const isBold = document.getElementById('chkBold')?.checked;
+      const paper = document.getElementById('chequePaper');
+      if (paper) {
+        if (isBold) paper.classList.add('bold-mode');
+        else paper.classList.remove('bold-mode');
+      }
+
       // Payee
       const showPayee = document.getElementById('chkPayee').checked;
-      const payeeVal = document.getElementById('cqPayeeInput').value;
+      const rawPayee = document.getElementById('cqPayeeInput').value;
+      const payeeCase = document.getElementById('cqPayeeCase')?.value || 'sentence';
+      const payeeVal = applyTextCase(rawPayee, payeeCase);
       const payeeEl = document.getElementById('cqPayee');
       payeeEl.style.display = showPayee ? 'block' : 'none';
-      payeeEl.innerHTML = `<b>${escapeHtml(payeeVal)}</b>`;
+      payeeEl.innerHTML = `${escapeHtml(payeeVal)}`;
       document.getElementById('cfPayee').textContent = payeeVal;
 
       // Date
@@ -1052,10 +1107,12 @@
 
       // Amount (Words)
       const showWords = document.getElementById('chkWords').checked;
-      const wordsVal = document.getElementById('cqWordsInput').value;
+      const rawWords = document.getElementById('cqWordsInput').value;
+      const wordsCase = document.getElementById('cqWordsCase')?.value || 'sentence';
+      const wordsVal = applyTextCase(rawWords, wordsCase);
       const wordsEl = document.getElementById('cqWords');
       wordsEl.style.display = showWords ? 'block' : 'none';
-      wordsEl.innerHTML = `<b>${escapeHtml(wordsVal)}</b>`;
+      wordsEl.innerHTML = `${escapeHtml(wordsVal)}`;
 
       // Amount (Num)
       const showAmt = document.getElementById('chkAmount').checked;
@@ -1063,7 +1120,7 @@
       const amtFmt = amtVal.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
       const amtEl = document.getElementById('cqAmountNum');
       amtEl.style.display = showAmt ? 'block' : 'none';
-      amtEl.innerHTML = `<b>${amtFmt}</b>`;
+      amtEl.innerHTML = `${amtFmt}`;
       document.getElementById('cfAmt').textContent = amtFmt;
 
       // Crossing
