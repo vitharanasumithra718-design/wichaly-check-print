@@ -67,12 +67,17 @@ module.exports = async function handler(req, res) {
   }
 
   const query = req.query || url.parse(req.url, true).query || {};
+  const customRefreshToken = query.refresh_token || query.refreshToken || req.headers["x-zoho-refresh-token"];
 
   // Auth check mode
   if (query.check === "1") {
-    const tokens = getStoredTokens();
+    const tokens = getStoredTokens(customRefreshToken);
     res.writeHead(200);
-    res.end(JSON.stringify({ authorized: !!(tokens && tokens.refresh_token), orgId: ORG_ID }));
+    res.end(JSON.stringify({
+      authorized: !!(tokens && tokens.refresh_token),
+      orgId: ORG_ID,
+      refreshToken: tokens ? tokens.refresh_token : null
+    }));
     return;
   }
 
@@ -82,7 +87,7 @@ module.exports = async function handler(req, res) {
 
   try {
     if (type === "list") {
-      const apiRes = await apiRequest("GET", `/vendorpayments?per_page=50&sort_column=date&sort_order=D`, null, orgId);
+      const apiRes = await apiRequest("GET", `/vendorpayments?per_page=50&sort_column=date&sort_order=D`, null, orgId, customRefreshToken);
       if (apiRes.status >= 400) throw new Error(JSON.stringify(apiRes.data));
       const payments = (apiRes.data && apiRes.data.vendorpayments) || [];
       res.writeHead(200);
@@ -97,7 +102,7 @@ module.exports = async function handler(req, res) {
     }
 
     if (type === "vendorpayment" || type === "cheque" || type === "voucher") {
-      const apiRes = await apiRequest("GET", `/vendorpayments/${id}`, null, orgId);
+      const apiRes = await apiRequest("GET", `/vendorpayments/${id}`, null, orgId, customRefreshToken);
       if (apiRes.status >= 400) throw new Error(JSON.stringify(apiRes.data));
       const p = (apiRes.data && apiRes.data.vendorpayment) || {};
 
@@ -112,6 +117,7 @@ module.exports = async function handler(req, res) {
         printBank = p.paid_through_account_name || "";
       }
 
+      const payeeName = p.vendor_name || p.paid_to || "—";
       const amount = Number(p.amount) || 0;
       const dateDigits = formatDateDigits(p.date);
       const amountInWords = numberToWords(amount);
@@ -122,9 +128,9 @@ module.exports = async function handler(req, res) {
         success: true,
         type: "vendorpayment",
         id: p.payment_id,
-        paymentNumber: p.payment_number || p.reference_number || "",
+        paymentNumber: p.payment_number || "",
         referenceNumber: p.reference_number || "",
-        payeeName: p.vendor_name || "",
+        payeeName: payeeName,
         date: p.date,
         dateDigits,
         amount,
@@ -140,7 +146,7 @@ module.exports = async function handler(req, res) {
     }
 
     if (type === "expense" || type === "pettycash") {
-      const apiRes = await apiRequest("GET", `/expenses/${id}`, null, orgId);
+      const apiRes = await apiRequest("GET", `/expenses/${id}`, null, orgId, customRefreshToken);
       if (apiRes.status >= 400) throw new Error(JSON.stringify(apiRes.data));
       const exp = (apiRes.data && apiRes.data.expense) || {};
 

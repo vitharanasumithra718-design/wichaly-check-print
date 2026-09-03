@@ -73,11 +73,19 @@ exports.handler = async function (event) {
     <a class="btn" href="/">← Go to Cheque Printer App</a>
   </div>
   <script>
+    const tokens = {
+      refreshToken: "${data.refresh_token}",
+      accessToken: "${data.access_token || ''}",
+      expiresAt: ${data.expires_at || 0}
+    };
+    try {
+      localStorage.setItem('zoho_refresh_token', tokens.refreshToken);
+    } catch (_) {}
     if (window.opener) {
       setTimeout(() => {
-        window.opener.postMessage({ type: 'ZOHO_AUTH_SUCCESS' }, '*');
+        window.opener.postMessage({ type: 'ZOHO_AUTH_SUCCESS', tokens: tokens, refreshToken: tokens.refreshToken }, '*');
         window.close();
-      }, 1500);
+      }, 1400);
     }
   </script>
 </body>

@@ -18,8 +18,8 @@ const API_URL      = "https://www.zohoapis.com/books/v3";
 let cachedToken          = null;
 let cachedTokenExpiresAt = 0;
 
-function getStoredTokens() {
-  const rt = process.env.ZOHO_REFRESH_TOKEN;
+function getStoredTokens(customRefreshToken) {
+  const rt = (customRefreshToken && String(customRefreshToken).trim()) || process.env.ZOHO_REFRESH_TOKEN;
   if (rt) {
     return {
       refresh_token: rt,
@@ -38,11 +38,9 @@ function getStoredTokens() {
 function saveTokens(tokens) {
   cachedToken          = tokens.access_token;
   cachedTokenExpiresAt = tokens.expires_at;
-  if (!process.env.ZOHO_REFRESH_TOKEN) {
-    try {
-      fs.writeFileSync(TOKENS_PATH, JSON.stringify(tokens, null, 2));
-    } catch (_) {}
-  }
+  try {
+    fs.writeFileSync(TOKENS_PATH, JSON.stringify(tokens, null, 2));
+  } catch (_) {}
 }
 
 async function refreshAccessToken(refreshToken, clientId, clientSecret) {
@@ -54,19 +52,20 @@ async function refreshAccessToken(refreshToken, clientId, clientSecret) {
   if (!data.access_token) {
     throw new Error("Failed to refresh Zoho token: " + JSON.stringify(data));
   }
-  const tokens = getStoredTokens() || {};
+  const tokens = getStoredTokens(refreshToken) || {};
+  tokens.refresh_token = refreshToken;
   tokens.access_token = data.access_token;
   tokens.expires_at   = Date.now() + (data.expires_in || 3600) * 1000;
   saveTokens(tokens);
   return data.access_token;
 }
 
-async function getAccessToken() {
-  if (cachedToken && cachedTokenExpiresAt && Date.now() < cachedTokenExpiresAt - 60000) {
+async function getAccessToken(customRefreshToken) {
+  if (!customRefreshToken && cachedToken && cachedTokenExpiresAt && Date.now() < cachedTokenExpiresAt - 60000) {
     return cachedToken;
   }
 
-  const tokens = getStoredTokens();
+  const tokens = getStoredTokens(customRefreshToken);
   if (!tokens || !tokens.refresh_token) {
     const err = new Error("NOT_AUTHORIZED");
     err.code = "NOT_AUTHORIZED";
@@ -82,8 +81,8 @@ async function getAccessToken() {
   return await refreshAccessToken(tokens.refresh_token);
 }
 
-async function apiRequest(method, endpoint, body, orgId) {
-  const accessToken = await getAccessToken();
+async function apiRequest(method, endpoint, body, orgId, customRefreshToken) {
+  const accessToken = await getAccessToken(customRefreshToken);
   const organizationId = orgId || ORG_ID;
   const separator = endpoint.includes("?") ? "&" : "?";
   const url = `${API_URL}${endpoint}${separator}organization_id=${organizationId}`;

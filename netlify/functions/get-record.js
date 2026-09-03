@@ -67,14 +67,19 @@ exports.handler = async function (event) {
   }
 
   const query = event.queryStringParameters || {};
+  const customRefreshToken = query.refresh_token || query.refreshToken || (event.headers && event.headers["x-zoho-refresh-token"]);
 
   // Auth check mode
   if (query.check === "1") {
-    const tokens = getStoredTokens();
+    const tokens = getStoredTokens(customRefreshToken);
     return {
       statusCode: 200,
       headers,
-      body: JSON.stringify({ authorized: !!(tokens && tokens.refresh_token), orgId: ORG_ID }),
+      body: JSON.stringify({
+        authorized: !!(tokens && tokens.refresh_token),
+        orgId: ORG_ID,
+        refreshToken: tokens ? tokens.refresh_token : null
+      }),
     };
   }
 
@@ -85,7 +90,7 @@ exports.handler = async function (event) {
   try {
     // If requesting payment list (for quick UI search/picker)
     if (type === "list") {
-      const res = await apiRequest("GET", `/vendorpayments?per_page=50&sort_column=date&sort_order=D`, null, orgId);
+      const res = await apiRequest("GET", `/vendorpayments?per_page=50&sort_column=date&sort_order=D`, null, orgId, customRefreshToken);
       if (res.status >= 400) throw new Error(JSON.stringify(res.data));
       const payments = (res.data && res.data.vendorpayments) || [];
       return {
@@ -104,7 +109,7 @@ exports.handler = async function (event) {
     }
 
     if (type === "vendorpayment" || type === "cheque" || type === "voucher") {
-      const res = await apiRequest("GET", `/vendorpayments/${id}`, null, orgId);
+      const res = await apiRequest("GET", `/vendorpayments/${id}`, null, orgId, customRefreshToken);
       if (res.status >= 400) throw new Error(JSON.stringify(res.data));
       const p = (res.data && res.data.vendorpayment) || {};
 
@@ -116,10 +121,11 @@ exports.handler = async function (event) {
           printBank = cf.value_formatted || cf.value || "";
         }
       }
-      if (!printBank) {
+      if (!printBank && p.paid_through_account_name) {
         printBank = p.paid_through_account_name || "";
       }
 
+      const payeeName = p.vendor_name || p.paid_to || "—";
       const amount = Number(p.amount) || 0;
       const dateDigits = formatDateDigits(p.date);
       const amountInWords = numberToWords(amount);
@@ -132,9 +138,9 @@ exports.handler = async function (event) {
           success: true,
           type: "vendorpayment",
           id: p.payment_id,
-          paymentNumber: p.payment_number || p.reference_number || "",
+          paymentNumber: p.payment_number || "",
           referenceNumber: p.reference_number || "",
-          payeeName: p.vendor_name || "",
+          payeeName: payeeName,
           date: p.date,
           dateDigits,
           amount,
@@ -150,7 +156,7 @@ exports.handler = async function (event) {
     }
 
     if (type === "expense" || type === "pettycash") {
-      const res = await apiRequest("GET", `/expenses/${id}`, null, orgId);
+      const res = await apiRequest("GET", `/expenses/${id}`, null, orgId, customRefreshToken);
       if (res.status >= 400) throw new Error(JSON.stringify(res.data));
       const exp = (res.data && res.data.expense) || {};
 

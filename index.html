@@ -931,11 +931,20 @@
           <input type="text" id="cfgClientId" value="1000.O5OO0M4Z233JXWHBH3BF3H54SMCXMH" style="width:100%; background:#0f172a; border:1px solid #334155; padding:8px 12px; color:#fff; border-radius:6px; font-family:monospace; font-size:12px;">
         </div>
         <div style="margin-bottom:14px;">
+          <label style="font-size:12px; font-weight:700; color:var(--text-muted); display:block; margin-bottom:4px;">Permanent Zoho Refresh Token (Persisted in Browser)</label>
+          <div style="display:flex; gap:8px;">
+            <input type="text" id="cfgRefreshToken" placeholder="Auto-saved on Connect" style="flex:1; background:#0f172a; border:1px solid #334155; padding:8px 12px; color:#38bdf8; border-radius:6px; font-family:monospace; font-size:12px;">
+            <button class="btn btn-secondary btn-sm" onclick="saveManualRefreshToken()">Save</button>
+          </div>
+          <small style="color:var(--text-muted); display:block; margin-top:4px;">Saved in browser localStorage to stay permanently connected without disconnecting.</small>
+        </div>
+        <div style="margin-bottom:14px;">
           <label style="font-size:12px; font-weight:700; color:var(--text-muted); display:block; margin-bottom:4px;">Default Company Label on Cheque</label>
           <input type="text" id="cfgCompanyName" value="WYCHERLEY INTERNATIONAL SCHOOL" style="width:100%; background:#0f172a; border:1px solid #334155; padding:8px 12px; color:#fff; border-radius:6px; font-weight:700;">
         </div>
-        <div style="margin-top:20px;">
+        <div style="margin-top:20px; display:flex; gap:10px;">
           <button class="btn btn-primary" onclick="startOAuth()">Connect with Zoho Books</button>
+          <button class="btn btn-secondary" onclick="checkAuth()">🔄 Verify Connection</button>
         </div>
       </div>
     </div>
@@ -1310,6 +1319,34 @@
       return (document.getElementById('cfgOrgId') && document.getElementById('cfgOrgId').value.trim()) || '933829154';
     }
 
+    function getSavedRefreshToken() {
+      return (document.getElementById('cfgRefreshToken') && document.getElementById('cfgRefreshToken').value.trim()) || localStorage.getItem('zoho_refresh_token') || '';
+    }
+
+    function saveManualRefreshToken() {
+      const val = document.getElementById('cfgRefreshToken').value.trim();
+      if (val) {
+        localStorage.setItem('zoho_refresh_token', val);
+        toast('✅ Saved Zoho Refresh Token permanently!');
+        checkAuth();
+      }
+    }
+
+    window.addEventListener('message', (e) => {
+      if (e.data && e.data.type === 'ZOHO_AUTH_SUCCESS') {
+        const rt = (e.data.tokens && e.data.tokens.refreshToken) || e.data.refreshToken;
+        if (rt) {
+          localStorage.setItem('zoho_refresh_token', rt);
+          if (document.getElementById('cfgRefreshToken')) {
+            document.getElementById('cfgRefreshToken').value = rt;
+          }
+        }
+        toast('✅ Zoho Books Connected Permanently!');
+        checkAuth();
+        loadQuickPayments(true);
+      }
+    });
+
     // Load Quick Payments Dropdown & Auto-select
     async function loadQuickPayments(manualTrigger = false) {
       const sel = document.getElementById('quickPaymentSelect');
@@ -1317,7 +1354,10 @@
       if (manualTrigger) toast('🔄 Fetching recent Zoho payments...');
       
       try {
-        const res = await fetch(`/api/get-record?type=list&organizationID=${getOrgId()}`);
+        const rt = getSavedRefreshToken();
+        const res = await fetch(`/api/get-record?type=list&organizationID=${getOrgId()}&refresh_token=${encodeURIComponent(rt)}`, {
+          headers: { 'X-Zoho-Refresh-Token': rt }
+        });
         const data = await res.json();
         if (data.success && data.payments && data.payments.length > 0) {
           sel.innerHTML = '<option value="">⚡ Select Zoho Payment (' + data.payments.length + ' available)...</option>' +
@@ -1357,7 +1397,10 @@
 
       toast('⚡ Auto-filling details from Zoho Books...');
       try {
-        const res = await fetch(`/api/get-record?type=${type}&id=${id}&organizationID=${orgId}`);
+        const rt = getSavedRefreshToken();
+        const res = await fetch(`/api/get-record?type=${type}&id=${id}&organizationID=${orgId}&refresh_token=${encodeURIComponent(rt)}`, {
+          headers: { 'X-Zoho-Refresh-Token': rt }
+        });
         const data = await res.json();
         if (data.success) {
           currentRecord = data;
@@ -1404,10 +1447,20 @@
         text.textContent = 'Run via start.bat';
         return;
       }
+      const rt = getSavedRefreshToken();
+      if (document.getElementById('cfgRefreshToken') && rt) {
+        document.getElementById('cfgRefreshToken').value = rt;
+      }
       try {
-        const res = await fetch(`/api/get-record?check=1&organizationID=${getOrgId()}`);
+        const res = await fetch(`/api/get-record?check=1&organizationID=${getOrgId()}&refresh_token=${encodeURIComponent(rt)}`, {
+          headers: { 'X-Zoho-Refresh-Token': rt }
+        });
         const data = await res.json();
         if (data.authorized) {
+          if (data.refreshToken) {
+            localStorage.setItem('zoho_refresh_token', data.refreshToken);
+            if (document.getElementById('cfgRefreshToken')) document.getElementById('cfgRefreshToken').value = data.refreshToken;
+          }
           badge.className = 'auth-badge connected';
           text.textContent = 'Zoho Connected';
         } else {
@@ -1433,7 +1486,10 @@
       const container = document.getElementById('paymentsListContainer');
       container.innerHTML = '<p style="color:var(--text-muted);">Loading payments from Zoho Books...</p>';
       try {
-        const res = await fetch(`/api/get-record?type=list&organizationID=${getOrgId()}`);
+        const rt = getSavedRefreshToken();
+        const res = await fetch(`/api/get-record?type=list&organizationID=${getOrgId()}&refresh_token=${encodeURIComponent(rt)}`, {
+          headers: { 'X-Zoho-Refresh-Token': rt }
+        });
         const data = await res.json();
         if (data.success && data.payments) {
           container.innerHTML = `
@@ -1473,7 +1529,10 @@
     async function selectPayment(paymentId, switchTab = true) {
       if (switchTab) toast('Loading payment #' + paymentId + '...');
       try {
-        const res = await fetch(`/api/get-record?type=vendorpayment&id=${paymentId}&organizationID=${getOrgId()}`);
+        const rt = getSavedRefreshToken();
+        const res = await fetch(`/api/get-record?type=vendorpayment&id=${paymentId}&organizationID=${getOrgId()}&refresh_token=${encodeURIComponent(rt)}`, {
+          headers: { 'X-Zoho-Refresh-Token': rt }
+        });
         const data = await res.json();
         if (data.success) {
           currentRecord = data;
