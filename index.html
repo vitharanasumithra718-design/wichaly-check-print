@@ -347,31 +347,39 @@
       font-weight: 700 !important;
     }
 
-    /* Crossing Graphics (Top-Left 2 Parallel Diagonal Lines & Text) */
+    /* Crossing Graphics (Horizontal & Diagonal Parallel Lines) */
     .cq-crossing-box {
       position: absolute;
-      top: 3mm;
+      top: 4mm;
       left: 6mm;
-      width: 32mm;
-      height: 20mm;
+      width: 45mm;
+      height: 7.5mm;
       pointer-events: none;
-    }
-    .cq-crossing-box.cross-lines {
       border-top: 1.5px solid #000;
       border-bottom: 1.5px solid #000;
-      transform: rotate(-35deg);
       display: flex;
       align-items: center;
       justify-content: center;
       text-align: center;
     }
+    .cq-crossing-box.cross-horizontal {
+      transform: none !important;
+      height: 7.5mm;
+    }
+    .cq-crossing-box.cross-diagonal {
+      width: 32mm;
+      height: 18mm;
+      transform: rotate(-35deg);
+    }
     .cq-crossing-text {
-      font-size: 8px;
-      font-weight: 800;
-      letter-spacing: 0.3px;
-      text-transform: uppercase;
+      font-size: 9px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      text-transform: none;
       line-height: 1.1;
       padding: 0 4px;
+      color: #000;
+      white-space: nowrap;
     }
 
     /* A/C Payee Top Center banner */
@@ -623,10 +631,15 @@
 
           <div class="ctrl-item">
             <label>Crossing Mode:</label>
-            <select id="cqCrossingSelect" onchange="updateLiveCheque()" style="min-width:200px;">
-              <option value="cross_ac_payee" selected>Cross A/C Payee (// Top-Left)</option>
-              <option value="cross_ac_not_negotiable">Cross A/C Payee + Not Negotiable</option>
-              <option value="cross_only">Cross Only (// Parallel Lines)</option>
+            <select id="cqCrossingSelect" onchange="updateLiveCheque()" style="min-width:240px; font-weight:600; background:#0f172a; color:#38bdf8; border:1px solid #334155; border-radius:6px;">
+              <option value="cross_h_ac_payee" selected>Horizontal (═ AC payee only ═)</option>
+              <option value="cross_h_ac_payee_title">Horizontal (═ A/C Payee Only ═)</option>
+              <option value="cross_h_ac_payee_upper">Horizontal (═ A/C PAYEE ONLY ═)</option>
+              <option value="cross_h_not_negotiable">Horizontal (═ A/C Payee + Not Negotiable ═)</option>
+              <option value="cross_h_only">Horizontal (═ ═ Double Lines Only)</option>
+              <option value="cross_diag_ac_payee">Diagonal (// Top-Left A/C PAYEE ONLY)</option>
+              <option value="cross_diag_not_negotiable">Diagonal (// Top-Left + Not Negotiable)</option>
+              <option value="cross_diag_only">Diagonal (// Top-Left Lines Only)</option>
               <option value="center_ac_payee">Center Banner (A/C PAYEE ONLY)</option>
               <option value="no_crossing">No Crossing (Bearer Cheque)</option>
             </select>
@@ -844,14 +857,19 @@
 
           <!-- Crossing Position -->
           <div class="calib-group">
-            <div class="calib-header"><span>Crossing Alignment</span><span id="valCross">3, 6</span></div>
+            <div class="calib-header"><span>Crossing Alignment</span><span id="valCross">4, 6</span></div>
             <div class="calib-row">
               <span style="width:58px;">Top:</span>
-              <input type="range" id="calCrossTop" min="0" max="40" step="0.5" value="3" oninput="updateCalib()">
+              <input type="range" id="calCrossTop" min="0" max="60" step="0.5" value="4" oninput="updateCalib()">
             </div>
             <div class="calib-row">
               <span style="width:58px;">Left:</span>
-              <input type="range" id="calCrossLeft" min="0" max="100" step="0.5" value="6" oninput="updateCalib()">
+              <input type="range" id="calCrossLeft" min="0" max="120" step="0.5" value="6" oninput="updateCalib()">
+            </div>
+            <div class="calib-row">
+              <span style="width:58px;">Width:</span>
+              <input type="range" id="calCrossWidth" min="20" max="90" step="1" value="45" oninput="updateCalib()">
+              <span class="val" id="valCrossWidth" style="width:34px; font-size:10.5px;">45mm</span>
             </div>
           </div>
 
@@ -961,12 +979,12 @@
 
     // Bank Calibration Presets
     const BANK_PRESETS = {
-      ntb: { dateTop: 5.0, dateLeft: 132, dateSpacing: 0.8, dateBoxWidth: 4.8, dateFontSize: 13.5, dateFormat: 'skip_20', crossTop: 3, crossLeft: 6, payeeTop: 20, payeeLeft: 22, wordsTop: 30, wordsLeft: 22, amtTop: 42, amtRight: 24 },
-      commercial: { dateTop: 5.5, dateLeft: 128, dateSpacing: 0.8, dateBoxWidth: 4.8, dateFontSize: 13.5, dateFormat: 'skip_20', crossTop: 3, crossLeft: 6, payeeTop: 20, payeeLeft: 22, wordsTop: 31, wordsLeft: 22, amtTop: 36, amtRight: 36 },
-      sampath: { dateTop: 3, dateLeft: 128, dateSpacing: 0.8, dateBoxWidth: 4.8, dateFontSize: 13.5, dateFormat: 'skip_20', crossTop: 3, crossLeft: 6, payeeTop: 18, payeeLeft: 22, wordsTop: 28, wordsLeft: 22, amtTop: 36, amtRight: 36 },
-      hnb: { dateTop: 4.5, dateLeft: 126, dateSpacing: 0.8, dateBoxWidth: 4.8, dateFontSize: 13.5, dateFormat: 'skip_20', crossTop: 3, crossLeft: 6, payeeTop: 19, payeeLeft: 22, wordsTop: 29, wordsLeft: 22, amtTop: 35, amtRight: 34 },
-      boc: { dateTop: 5, dateLeft: 127, dateSpacing: 0.8, dateBoxWidth: 4.8, dateFontSize: 13.5, dateFormat: 'skip_20', crossTop: 3, crossLeft: 6, payeeTop: 21, payeeLeft: 20, wordsTop: 32, wordsLeft: 20, amtTop: 37, amtRight: 35 },
-      seylan: { dateTop: 5.5, dateLeft: 128, dateSpacing: 0.8, dateBoxWidth: 4.8, dateFontSize: 13.5, dateFormat: 'skip_20', crossTop: 3, crossLeft: 6, payeeTop: 20, payeeLeft: 22, wordsTop: 30, wordsLeft: 22, amtTop: 36, amtRight: 36 }
+      ntb: { dateTop: 5.0, dateLeft: 132, dateSpacing: 0.8, dateBoxWidth: 4.8, dateFontSize: 13.5, dateFormat: 'skip_20', crossTop: 4, crossLeft: 6, crossWidth: 45, payeeTop: 20, payeeLeft: 22, wordsTop: 30, wordsLeft: 22, amtTop: 42, amtRight: 24 },
+      commercial: { dateTop: 5.5, dateLeft: 128, dateSpacing: 0.8, dateBoxWidth: 4.8, dateFontSize: 13.5, dateFormat: 'skip_20', crossTop: 4, crossLeft: 6, crossWidth: 45, payeeTop: 20, payeeLeft: 22, wordsTop: 31, wordsLeft: 22, amtTop: 36, amtRight: 36 },
+      sampath: { dateTop: 3, dateLeft: 128, dateSpacing: 0.8, dateBoxWidth: 4.8, dateFontSize: 13.5, dateFormat: 'skip_20', crossTop: 4, crossLeft: 6, crossWidth: 45, payeeTop: 18, payeeLeft: 22, wordsTop: 28, wordsLeft: 22, amtTop: 36, amtRight: 36 },
+      hnb: { dateTop: 4.5, dateLeft: 126, dateSpacing: 0.8, dateBoxWidth: 4.8, dateFontSize: 13.5, dateFormat: 'skip_20', crossTop: 4, crossLeft: 6, crossWidth: 45, payeeTop: 19, payeeLeft: 22, wordsTop: 29, wordsLeft: 22, amtTop: 35, amtRight: 34 },
+      boc: { dateTop: 5, dateLeft: 127, dateSpacing: 0.8, dateBoxWidth: 4.8, dateFontSize: 13.5, dateFormat: 'skip_20', crossTop: 4, crossLeft: 6, crossWidth: 45, payeeTop: 21, payeeLeft: 20, wordsTop: 32, wordsLeft: 20, amtTop: 37, amtRight: 35 },
+      seylan: { dateTop: 5.5, dateLeft: 128, dateSpacing: 0.8, dateBoxWidth: 4.8, dateFontSize: 13.5, dateFormat: 'skip_20', crossTop: 4, crossLeft: 6, crossWidth: 45, payeeTop: 20, payeeLeft: 22, wordsTop: 30, wordsLeft: 22, amtTop: 36, amtRight: 36 }
     };
 
     let currentRecord = {
@@ -1140,15 +1158,39 @@
 
       linesEl.style.display = 'none';
       centerEl.style.display = 'none';
+      linesEl.classList.remove('cross-horizontal', 'cross-diagonal');
 
-      if (crossingMode === 'cross_ac_payee') {
+      if (crossingMode === 'cross_h_ac_payee') {
         linesEl.style.display = 'flex';
+        linesEl.classList.add('cross-horizontal');
+        linesText.textContent = 'AC payee only';
+      } else if (crossingMode === 'cross_h_ac_payee_title') {
+        linesEl.style.display = 'flex';
+        linesEl.classList.add('cross-horizontal');
+        linesText.textContent = 'A/C Payee Only';
+      } else if (crossingMode === 'cross_h_ac_payee_upper') {
+        linesEl.style.display = 'flex';
+        linesEl.classList.add('cross-horizontal');
         linesText.textContent = 'A/C PAYEE ONLY';
-      } else if (crossingMode === 'cross_ac_not_negotiable') {
+      } else if (crossingMode === 'cross_h_not_negotiable') {
         linesEl.style.display = 'flex';
+        linesEl.classList.add('cross-horizontal');
+        linesText.innerHTML = 'A/C Payee Only<br><span style="font-size:6.5px;">Not Negotiable</span>';
+      } else if (crossingMode === 'cross_h_only') {
+        linesEl.style.display = 'flex';
+        linesEl.classList.add('cross-horizontal');
+        linesText.textContent = '';
+      } else if (crossingMode === 'cross_diag_ac_payee' || crossingMode === 'cross_ac_payee') {
+        linesEl.style.display = 'flex';
+        linesEl.classList.add('cross-diagonal');
+        linesText.textContent = 'A/C PAYEE ONLY';
+      } else if (crossingMode === 'cross_diag_not_negotiable' || crossingMode === 'cross_ac_not_negotiable') {
+        linesEl.style.display = 'flex';
+        linesEl.classList.add('cross-diagonal');
         linesText.innerHTML = 'A/C PAYEE ONLY<br><span style="font-size:6.5px;">NOT NEGOTIABLE</span>';
-      } else if (crossingMode === 'cross_only') {
+      } else if (crossingMode === 'cross_diag_only' || crossingMode === 'cross_only') {
         linesEl.style.display = 'flex';
+        linesEl.classList.add('cross-diagonal');
         linesText.textContent = '';
       } else if (crossingMode === 'center_ac_payee') {
         centerEl.style.display = 'block';
@@ -1206,8 +1248,9 @@
       const dBoxWidth = parseFloat(document.getElementById('calDateBoxWidth')?.value || 4.8);
       const dFontSize = parseFloat(document.getElementById('calDateFontSize')?.value || 13.5);
 
-      const cTop = document.getElementById('calCrossTop')?.value || 3;
+      const cTop = document.getElementById('calCrossTop')?.value || 4;
       const cLeft = document.getElementById('calCrossLeft')?.value || 6;
+      const cWidth = document.getElementById('calCrossWidth')?.value || 45;
 
       const pTop = document.getElementById('calPayeeTop').value;
       const pLeft = document.getElementById('calPayeeLeft').value;
@@ -1221,6 +1264,7 @@
       if (document.getElementById('valDateBoxWidth')) document.getElementById('valDateBoxWidth').textContent = `${dBoxWidth}mm`;
       if (document.getElementById('valDateFontSize')) document.getElementById('valDateFontSize').textContent = `${dFontSize}px`;
       if (document.getElementById('valCross')) document.getElementById('valCross').textContent = `${cTop}, ${cLeft}`;
+      if (document.getElementById('valCrossWidth')) document.getElementById('valCrossWidth').textContent = `${cWidth}mm`;
       if (document.getElementById('valPayee')) document.getElementById('valPayee').textContent = `${pTop}, ${pLeft}`;
       if (document.getElementById('valWords')) document.getElementById('valWords').textContent = `${wTop}, ${wLeft}`;
       if (document.getElementById('valAmt')) document.getElementById('valAmt').textContent = `${aTop}, ${aRight}`;
@@ -1240,6 +1284,7 @@
       if (linesEl) {
         linesEl.style.top = cTop + 'mm';
         linesEl.style.left = cLeft + 'mm';
+        linesEl.style.width = cWidth + 'mm';
       }
 
       const payeeEl = document.getElementById('cqPayee');
@@ -1270,8 +1315,9 @@
       if (document.getElementById('calDateBoxWidth')) document.getElementById('calDateBoxWidth').value = p.dateBoxWidth || 4.8;
       if (document.getElementById('calDateFontSize')) document.getElementById('calDateFontSize').value = p.dateFontSize || 13.5;
       if (document.getElementById('cqDateFormat') && p.dateFormat) document.getElementById('cqDateFormat').value = p.dateFormat;
-      if (document.getElementById('calCrossTop')) document.getElementById('calCrossTop').value = p.crossTop || 3;
+      if (document.getElementById('calCrossTop')) document.getElementById('calCrossTop').value = p.crossTop || 4;
       if (document.getElementById('calCrossLeft')) document.getElementById('calCrossLeft').value = p.crossLeft || 6;
+      if (document.getElementById('calCrossWidth')) document.getElementById('calCrossWidth').value = p.crossWidth || 45;
       if (document.getElementById('calPayeeTop')) document.getElementById('calPayeeTop').value = p.payeeTop;
       if (document.getElementById('calPayeeLeft')) document.getElementById('calPayeeLeft').value = p.payeeLeft;
       if (document.getElementById('calWordsTop')) document.getElementById('calWordsTop').value = p.wordsTop;
@@ -1302,8 +1348,9 @@
         dateBoxWidth: document.getElementById('calDateBoxWidth')?.value || 4.8,
         dateFontSize: document.getElementById('calDateFontSize')?.value || 13.5,
         dateFormat: document.getElementById('cqDateFormat')?.value || 'skip_20',
-        crossTop: document.getElementById('calCrossTop')?.value || 3,
+        crossTop: document.getElementById('calCrossTop')?.value || 4,
         crossLeft: document.getElementById('calCrossLeft')?.value || 6,
+        crossWidth: document.getElementById('calCrossWidth')?.value || 45,
         payeeTop: document.getElementById('calPayeeTop').value,
         payeeLeft: document.getElementById('calPayeeLeft').value,
         wordsTop: document.getElementById('calWordsTop').value,
