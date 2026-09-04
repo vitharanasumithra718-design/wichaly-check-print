@@ -677,7 +677,7 @@
           <div class="ctrl-item" style="background:#064e3b; border:1px solid #10b981; padding:4px 8px; border-radius:8px;">
             <label style="color:#6ee7b7; font-weight:700;">🖨️ Printer Feed Mode:</label>
             <select id="cqFeedMode" onchange="onFeedModeChange()" style="font-size:12px; padding:4px 6px; font-weight:700; background:#0f172a; color:#34d399; border:1px solid #059669; border-radius:6px;">
-              <option value="dl_horiz" selected>✉️ Envelope DL (Auto Match: +21mm Top, +42mm Left)</option>
+              <option value="dl_horiz" selected>✉️ Envelope DL (Exact Match: 0mm Top, +42mm Left)</option>
               <option value="dl_horiz_0">✉️ Envelope DL (Zero Offset: 0mm Top, 0mm Left)</option>
               <option value="dl_horiz_center">✉️ Envelope DL (Centered: +10.5mm Top, +21mm Left)</option>
               <option value="a4">📄 Standard A4 Paper (Landscape Top-Left)</option>
@@ -912,7 +912,7 @@
               <input type="range" id="calMasterLeft" min="0" max="150" step="1" value="0" oninput="updateCalib()">
             </div>
             <div style="display:flex; flex-wrap:wrap; gap:4px; margin-top:6px;">
-              <button class="btn btn-primary btn-sm" style="flex:1 1 100%; font-size:11px; padding:4px 6px; background:#0284c7;" onclick="setMasterOffset(21, 42)" title="Envelope DL Auto Offset (+21mm Top, +42mm Left)">✉️ DL Auto Match (+21, +42)</button>
+              <button class="btn btn-primary btn-sm" style="flex:1 1 100%; font-size:11px; padding:4px 6px; background:#0284c7;" onclick="setMasterOffset(0, 42)" title="Envelope DL Match (0mm Top, +42mm Left)">✉️ DL Match (0, +42)</button>
               <button class="btn btn-ghost btn-sm" style="flex:1; font-size:10px; padding:3px 4px;" onclick="setMasterOffset(0, 0)" title="Zero Offset (0, 0)">🎯 Zero (0,0)</button>
               <button class="btn btn-ghost btn-sm" style="flex:1; font-size:10px; padding:3px 4px;" onclick="setMasterOffset(10.5, 21)" title="Envelope DL Landscape Centered">✉️ DL Mid</button>
               <button class="btn btn-ghost btn-sm" style="flex:1; font-size:10px; padding:3px 4px;" onclick="nudgeMaster(-5, 0)">⬆️ -5mm</button>
@@ -1324,16 +1324,16 @@
         'feed-vert-90', 'feed-vert-270', 'feed-horiz', 'feed-a4'
       );
 
-      let label = '✉️ Envelope DL (Exact Cheque Match: +21mm Top, +42mm Left)';
-      let masterTop = 21;
+      let label = '✉️ Envelope DL (Exact Cheque Match: 0mm Top, +42mm Left)';
+      let masterTop = 0;
       let masterLeft = 42;
       let pageCss = '@page { size: landscape; margin: 0mm !important; }';
 
       if (mode === 'dl_horiz') {
         document.body.classList.add('feed-horiz');
-        label = '✉️ Envelope DL — Auto Match (+21mm Top, +42mm Left)';
+        label = '✉️ Envelope DL — Exact Match (0mm Top, +42mm Left)';
         pageCss = '@page { size: landscape; margin: 0mm !important; }';
-        masterTop = 21;
+        masterTop = 0;
         masterLeft = 42;
       } else if (mode === 'dl_horiz_0') {
         document.body.classList.add('feed-horiz');
