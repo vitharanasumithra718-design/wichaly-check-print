@@ -1,5 +1,5 @@
 // api/get-record.js
-const { apiRequest, getStoredTokens, ORG_ID } = require("./zohoAuth");
+const { apiRequest, getStoredTokens, getAccessToken, ORG_ID } = require("./zohoAuth");
 const url = require("url");
 
 function numberToWords(num) {
@@ -86,6 +86,17 @@ module.exports = async function handler(req, res) {
   const orgId = query.organizationID || query.orgId || ORG_ID;
 
   try {
+    if (type === "organizations" || type === "orgs") {
+      const accessToken = await getAccessToken(customRefreshToken);
+      const resOrg = await fetch("https://www.zohoapis.com/books/v3/organizations", {
+        headers: { Authorization: `Zoho-oauthtoken ${accessToken}` }
+      });
+      const dataOrg = await resOrg.json();
+      res.writeHead(200);
+      res.end(JSON.stringify(dataOrg));
+      return;
+    }
+
     if (type === "list") {
       const apiRes = await apiRequest("GET", `/vendorpayments?per_page=50&sort_column=date&sort_order=D`, null, orgId, customRefreshToken);
       if (apiRes.status >= 400) throw new Error(JSON.stringify(apiRes.data));
