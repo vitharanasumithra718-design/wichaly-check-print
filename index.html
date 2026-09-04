@@ -240,13 +240,6 @@
     /* =========================================================================
        PRINTABLE CHEQUE WRAPPER (Cheque + Optional Counterfoil)
        ========================================================================= */
-    :root {
-      --cq-width: 178mm;
-      --cq-height: 89mm;
-      --master-top: 0mm;
-      --master-left: 0mm;
-    }
-
     .full-cheque-wrapper {
       display: flex;
       background: #ffffff;
@@ -257,15 +250,12 @@
       font-family: 'Plus Jakarta Sans', sans-serif;
       user-select: none;
       position: relative;
-      margin-top: var(--master-top, 0mm);
-      margin-left: var(--master-left, 0mm);
-      transition: width 0.2s, height 0.2s;
     }
 
     /* Counterfoil / Left Stub Paper */
     .counterfoil-paper {
       width: 2.75in;
-      height: var(--cq-height, 89mm);
+      height: 3.875in;
       border-right: 1.5px dashed #64748b;
       padding: 12px 14px;
       font-size: 11px;
@@ -280,13 +270,13 @@
     .cf-label { font-size: 9.5px; font-weight: 700; color: #475569; text-transform: uppercase; }
     .cf-val { font-size: 11.5px; font-weight: 700; font-family: 'Space Mono', monospace; border-bottom: 1px solid #94a3b8; min-height: 16px; padding: 1px 0; }
 
-    /* Main Cheque Paper (178mm x 89mm / 7.0in x 3.5in) */
+    /* Main Cheque Paper (7.5in x 3.875in) */
     .cheque-paper {
-      width: var(--cq-width, 178mm);
-      height: var(--cq-height, 89mm);
+      width: 7.5in;
+      height: 3.875in;
       position: relative;
       background: #ffffff;
-      overflow: visible;
+      overflow: hidden;
     }
 
     /* Cheque Floating Elements with exact mm placements */
@@ -491,67 +481,18 @@
     .toast.show { opacity: 1; transform: none; }
 
     /* =========================================================================
-       PRINT RULES (PERFECT ZERO MARGIN CHEQUE PRINT WITH FEED ROTATIONS)
+       PRINT RULES (PERFECT ZERO MARGIN CHEQUE PRINT)
        ========================================================================= */
     @page {
-      size: auto;
+      size: landscape;
       margin: 0mm !important;
     }
 
     @media print {
       @page {
+        size: landscape;
         margin: 0mm !important;
       }
-
-      body.feed-vert-90 .full-cheque-wrapper {
-        width: var(--cq-height, 89mm) !important;
-        height: var(--cq-width, 178mm) !important;
-        position: absolute !important;
-        top: var(--master-top, 0mm) !important;
-        left: var(--master-left, 0mm) !important;
-        overflow: visible !important;
-      }
-      body.feed-vert-90 .cheque-paper {
-        width: var(--cq-width, 178mm) !important;
-        height: var(--cq-height, 89mm) !important;
-        transform-origin: 0 0 !important;
-        transform: translateY(var(--cq-width, 178mm)) rotate(-90deg) !important;
-        overflow: visible !important;
-      }
-
-      body.feed-vert-270 .full-cheque-wrapper {
-        width: var(--cq-height, 89mm) !important;
-        height: var(--cq-width, 178mm) !important;
-        position: absolute !important;
-        top: var(--master-top, 0mm) !important;
-        left: var(--master-left, 0mm) !important;
-        overflow: visible !important;
-      }
-      body.feed-vert-270 .cheque-paper {
-        width: var(--cq-width, 178mm) !important;
-        height: var(--cq-height, 89mm) !important;
-        transform-origin: 0 0 !important;
-        transform: translateX(var(--cq-height, 89mm)) rotate(90deg) !important;
-        overflow: visible !important;
-      }
-
-      body.feed-horiz .full-cheque-wrapper,
-      body.feed-a4 .full-cheque-wrapper {
-        width: var(--cq-width, 178mm) !important;
-        height: var(--cq-height, 89mm) !important;
-        position: absolute !important;
-        top: var(--master-top, 0mm) !important;
-        left: var(--master-left, 0mm) !important;
-        overflow: visible !important;
-      }
-      body.feed-horiz .cheque-paper,
-      body.feed-a4 .cheque-paper {
-        width: var(--cq-width, 178mm) !important;
-        height: var(--cq-height, 89mm) !important;
-        transform: none !important;
-        overflow: visible !important;
-      }
-
       body, html {
         background: transparent !important;
         margin: 0 !important;
@@ -562,7 +503,7 @@
         -webkit-print-color-adjust: exact !important;
         print-color-adjust: exact !important;
       }
-      .file-warn-banner, header.app-nav, .cheque-control-box, .calib-card, .no-print, .toast, .feed-info-pill {
+      .file-warn-banner, header.app-nav, .cheque-control-box, .calib-card, .no-print, .toast {
         display: none !important;
       }
       .container {
@@ -609,6 +550,10 @@
       body.mode-cheque-single .counterfoil-paper {
         display: none !important;
       }
+      body.mode-cheque-single .cheque-paper {
+        width: 7.5in !important;
+        height: 3.875in !important;
+      }
     }
   </style>
 </head>
@@ -651,11 +596,11 @@
       <!-- Interactive Cheque Control Toolbar -->
       <div class="cheque-control-box no-print">
         
-        <!-- Row 1: Bank, Date, Crossing, Feed Direction, Print Button -->
+        <!-- Row 1: Bank, Date, Crossing, Quick Payment Selector, Print Button -->
         <div class="cq-toolbar-row" style="flex-wrap:wrap; gap:10px;">
           <div class="ctrl-item" style="background:#1e293b; border:1px solid #0284c7; padding:4px 10px; border-radius:8px;">
             <label style="color:#38bdf8; font-weight:700;">⚡ Zoho Payment:</label>
-            <select id="quickPaymentSelect" onchange="if(this.value) selectPayment(this.value)" style="min-width:230px; background:#0f172a; color:#fff; border:1px solid #334155;">
+            <select id="quickPaymentSelect" onchange="if(this.value) selectPayment(this.value)" style="min-width:240px; background:#0f172a; color:#fff; border:1px solid #334155;">
               <option value="">Loading Zoho payments...</option>
             </select>
             <button class="btn btn-secondary btn-sm" onclick="loadQuickPayments(true)" title="Refresh Payments">🔄</button>
@@ -664,25 +609,13 @@
           <div class="ctrl-item">
             <label>🏦 Bank:</label>
             <select id="bankPreset" onchange="applyBankPreset(this.value)" style="min-width:170px;">
-              <option value="seylan" selected>Seylan Bank (Prime Business)</option>
-              <option value="ntb">Nations Trust Bank (NTB)</option>
+              <option value="ntb" selected>Nations Trust Bank (NTB)</option>
               <option value="commercial">Commercial Bank</option>
               <option value="sampath">Sampath Bank</option>
               <option value="hnb">Hatton National Bank (HNB)</option>
               <option value="boc">Bank of Ceylon (BOC)</option>
+              <option value="seylan">Seylan Bank</option>
               <option value="custom">Custom Alignment</option>
-            </select>
-          </div>
-
-          <div class="ctrl-item" style="background:#064e3b; border:1px solid #10b981; padding:4px 8px; border-radius:8px;">
-            <label style="color:#6ee7b7; font-weight:700;">🖨️ Printer Feed Mode:</label>
-            <select id="cqFeedMode" onchange="onFeedModeChange()" style="font-size:12px; padding:4px 6px; font-weight:700; background:#0f172a; color:#34d399; border:1px solid #059669; border-radius:6px;">
-              <option value="dl_horiz" selected>✉️ Envelope DL (Horizontal Landscape 0, 0)</option>
-              <option value="a4">📄 Standard A4 Paper (Landscape Top-Left)</option>
-              <option value="cheque_direct">🏦 Exact Cheque Size (178mm × 89mm Direct)</option>
-              <option value="dl_horiz_center">✉️ Envelope DL (Centered: +10.5mm Top, +21mm Left)</option>
-              <option value="dl_vert_90">⬇️ Vertical Feed 90° (Narrow Edge Flap Feed)</option>
-              <option value="vert_270">🔄 Vertical Feed (Reversed 270°)</option>
             </select>
           </div>
 
@@ -698,7 +631,7 @@
 
           <div class="ctrl-item">
             <label>Crossing Mode:</label>
-            <select id="cqCrossingSelect" onchange="updateLiveCheque()" style="min-width:210px; font-weight:600; background:#0f172a; color:#38bdf8; border:1px solid #334155; border-radius:6px;">
+            <select id="cqCrossingSelect" onchange="updateLiveCheque()" style="min-width:240px; font-weight:600; background:#0f172a; color:#38bdf8; border:1px solid #334155; border-radius:6px;">
               <option value="cross_h_ac_payee" selected>Horizontal (═ AC payee only ═)</option>
               <option value="cross_h_ac_payee_title">Horizontal (═ A/C Payee Only ═)</option>
               <option value="cross_h_ac_payee_upper">Horizontal (═ A/C PAYEE ONLY ═)</option>
@@ -787,11 +720,6 @@
 
         <!-- Cheque Canvas Area -->
         <div class="preview-canvas-card">
-          <div class="feed-info-pill no-print" style="background:#0f2b48; border:1px solid #0284c7; padding:6px 14px; border-radius:8px; margin-bottom:14px; display:flex; justify-content:space-between; align-items:center; font-size:12px; color:#38bdf8; font-weight:600; width:100%; max-width:750px;">
-            <span>🖨️ Selected Feed: <strong style="color:#fff;" id="feedStatusText">⬇️ Vertical Feed (Narrow 89mm Edge — As in Photo)</strong></span>
-            <span style="color:#94a3b8; font-size:11px;">Cheque Leaf: 178mm × 89mm (NTB)</span>
-          </div>
-
           <div class="full-cheque-wrapper" id="fullChequeWrapper">
 
             <!-- Optional Counterfoil / Cheque Book Stub (Left Part) -->
@@ -878,24 +806,6 @@
             <button class="btn btn-ghost btn-sm" onclick="resetCalibration()">Reset</button>
           </h3>
 
-          <!-- Cheque Leaf Dimensions (from ruler: 178mm x 89mm) -->
-          <div class="calib-group" style="background:#0f2b48; border:1px solid #0284c7; margin-bottom:12px;">
-            <div class="calib-header" style="color:#38bdf8;">
-              <span>📏 Cheque Leaf Size</span>
-              <span id="valCqSize">178mm × 89mm</span>
-            </div>
-            <div class="calib-row">
-              <span style="width:60px;">Length:</span>
-              <input type="range" id="calCqWidth" min="150" max="220" step="1" value="178" oninput="updateCalib()">
-              <span class="val" id="valCqWidth" style="width:38px; font-size:10.5px;">178mm</span>
-            </div>
-            <div class="calib-row">
-              <span style="width:60px;">Height:</span>
-              <input type="range" id="calCqHeight" min="70" max="110" step="1" value="89" oninput="updateCalib()">
-              <span class="val" id="valCqHeight" style="width:38px; font-size:10.5px;">89mm</span>
-            </div>
-          </div>
-
           <!-- Master Page Offset -->
           <div class="calib-group" style="background:#0f2b48; border:1px solid #0284c7; margin-bottom:12px;">
             <div class="calib-header" style="color:#38bdf8;">
@@ -904,35 +814,29 @@
             </div>
             <div class="calib-row">
               <span style="width:36px;">Top:</span>
-              <input type="range" id="calMasterTop" min="-60" max="200" step="0.5" value="0" oninput="updateCalib()">
+              <input type="range" id="calMasterTop" min="0" max="200" step="1" value="0" oninput="updateCalib()">
             </div>
             <div class="calib-row">
               <span style="width:36px;">Left:</span>
-              <input type="range" id="calMasterLeft" min="-100" max="200" step="0.5" value="0" oninput="updateCalib()">
+              <input type="range" id="calMasterLeft" min="0" max="150" step="1" value="0" oninput="updateCalib()">
             </div>
-            <div style="display:flex; flex-wrap:wrap; gap:4px; margin-top:6px;">
-              <button class="btn btn-primary btn-sm" style="flex:1 1 100%; font-size:11px; padding:4px 6px; background:#0284c7;" onclick="setMasterOffset(0, 0)" title="Zero Offset (0, 0)">🎯 Standard Zero (0, 0)</button>
-              <button class="btn btn-ghost btn-sm" style="flex:1; font-size:10px; padding:3px 4px;" onclick="nudgeMaster(0, -10)">⬅️ -10mm</button>
-              <button class="btn btn-ghost btn-sm" style="flex:1; font-size:10px; padding:3px 4px;" onclick="nudgeMaster(0, 10)">➡️ +10mm</button>
-              <button class="btn btn-ghost btn-sm" style="flex:1; font-size:10px; padding:3px 4px;" onclick="nudgeMaster(-5, 0)">⬆️ -5mm</button>
-              <button class="btn btn-ghost btn-sm" style="flex:1; font-size:10px; padding:3px 4px;" onclick="nudgeMaster(5, 0)">⬇️ +5mm</button>
-              <button class="btn btn-ghost btn-sm" style="flex:1; font-size:10px; padding:3px 4px;" onclick="nudgeMaster(0, -2)">⬅️ -2mm</button>
-              <button class="btn btn-ghost btn-sm" style="flex:1; font-size:10px; padding:3px 4px;" onclick="nudgeMaster(0, 2)">➡️ +2mm</button>
-              <button class="btn btn-ghost btn-sm" style="flex:1; font-size:10px; padding:3px 4px;" onclick="nudgeMaster(-2, 0)">⬆️ -2mm</button>
-              <button class="btn btn-ghost btn-sm" style="flex:1; font-size:10px; padding:3px 4px;" onclick="nudgeMaster(2, 0)">⬇️ +2mm</button>
+            <div style="display:flex; gap:4px; margin-top:6px;">
+              <button class="btn btn-ghost btn-sm" style="flex:1; font-size:10.5px; padding:3px 4px;" onclick="setMasterOffset(0, 0)">Top (0mm)</button>
+              <button class="btn btn-ghost btn-sm" style="flex:1; font-size:10.5px; padding:3px 4px;" onclick="setMasterOffset(30, 0)">Mid (30mm)</button>
+              <button class="btn btn-ghost btn-sm" style="flex:1; font-size:10.5px; padding:3px 4px;" onclick="setMasterOffset(60, 0)">Center (60mm)</button>
             </div>
           </div>
 
           <!-- Date Alignment -->
           <div class="calib-group">
-            <div class="calib-header"><span>Date Box Position &amp; Grid</span><span id="valDate">5.5, 130</span></div>
+            <div class="calib-header"><span>Date Box Position &amp; Grid</span><span id="valDate">5, 132</span></div>
             <div class="calib-row">
               <span style="width:70px;">Top:</span>
-              <input type="range" id="calDateTop" min="0" max="85" step="0.5" value="5.5" oninput="updateCalib()">
+              <input type="range" id="calDateTop" min="0" max="30" step="0.5" value="5" oninput="updateCalib()">
             </div>
             <div class="calib-row">
               <span style="width:70px;">Left:</span>
-              <input type="range" id="calDateLeft" min="40" max="175" step="0.5" value="130" oninput="updateCalib()">
+              <input type="range" id="calDateLeft" min="80" max="170" step="0.5" value="132" oninput="updateCalib()">
             </div>
             <div class="calib-row">
               <span style="width:70px;">Digit Gap:</span>
@@ -971,40 +875,40 @@
 
           <!-- Payee Alignment -->
           <div class="calib-group">
-            <div class="calib-header"><span>Payee Name</span><span id="valPayee">20, 28</span></div>
+            <div class="calib-header"><span>Payee Name</span><span id="valPayee">19, 22</span></div>
             <div class="calib-row">
               <span style="width:28px;">Top:</span>
-              <input type="range" id="calPayeeTop" min="0" max="80" step="0.5" value="20" oninput="updateCalib()">
+              <input type="range" id="calPayeeTop" min="10" max="40" step="0.5" value="19" oninput="updateCalib()">
             </div>
             <div class="calib-row">
               <span style="width:28px;">Left:</span>
-              <input type="range" id="calPayeeLeft" min="0" max="150" step="0.5" value="28" oninput="updateCalib()">
+              <input type="range" id="calPayeeLeft" min="10" max="60" step="0.5" value="22" oninput="updateCalib()">
             </div>
           </div>
 
           <!-- Words Alignment -->
           <div class="calib-group">
-            <div class="calib-header"><span>Amount in Words</span><span id="valWords">29.5, 30</span></div>
+            <div class="calib-header"><span>Amount in Words</span><span id="valWords">29, 22</span></div>
             <div class="calib-row">
               <span style="width:28px;">Top:</span>
-              <input type="range" id="calWordsTop" min="0" max="80" step="0.5" value="29.5" oninput="updateCalib()">
+              <input type="range" id="calWordsTop" min="20" max="60" step="0.5" value="29" oninput="updateCalib()">
             </div>
             <div class="calib-row">
               <span style="width:28px;">Left:</span>
-              <input type="range" id="calWordsLeft" min="0" max="150" step="0.5" value="30" oninput="updateCalib()">
+              <input type="range" id="calWordsLeft" min="10" max="60" step="0.5" value="22" oninput="updateCalib()">
             </div>
           </div>
 
           <!-- Numeric Amount Alignment -->
           <div class="calib-group">
-            <div class="calib-header"><span>Amount (Number)</span><span id="valAmt">38, 22</span></div>
+            <div class="calib-header"><span>Amount (Number)</span><span id="valAmt">35, 34</span></div>
             <div class="calib-row">
               <span style="width:28px;">Top:</span>
-              <input type="range" id="calAmtTop" min="0" max="85" step="0.5" value="38" oninput="updateCalib()">
+              <input type="range" id="calAmtTop" min="20" max="60" step="0.5" value="35" oninput="updateCalib()">
             </div>
             <div class="calib-row">
               <span style="width:28px;">Right:</span>
-              <input type="range" id="calAmtRight" min="-50" max="100" step="0.5" value="22" oninput="updateCalib()">
+              <input type="range" id="calAmtRight" min="10" max="80" step="0.5" value="34" oninput="updateCalib()">
             </div>
           </div>
 
@@ -1073,14 +977,14 @@
       document.getElementById('fileWarnBanner').classList.add('show');
     }
 
-    // Bank Calibration Presets (Calibrated to Sri Lankan physical cheque leaves: 178mm x 89mm)
+    // Bank Calibration Presets
     const BANK_PRESETS = {
-      seylan: { cqWidth: 178, cqHeight: 89, dateTop: 5.5, dateLeft: 130, dateSpacing: 0.8, dateBoxWidth: 4.8, dateFontSize: 13.5, dateFormat: 'skip_20', crossTop: 4, crossLeft: 6, crossWidth: 45, payeeTop: 20, payeeLeft: 28, wordsTop: 29.5, wordsLeft: 30, amtTop: 38, amtRight: 22 },
-      ntb: { cqWidth: 178, cqHeight: 89, dateTop: 5.5, dateLeft: 132, dateSpacing: 0.8, dateBoxWidth: 4.8, dateFontSize: 13.5, dateFormat: 'skip_20', crossTop: 4, crossLeft: 6, crossWidth: 45, payeeTop: 20, payeeLeft: 28, wordsTop: 29.5, wordsLeft: 30, amtTop: 38, amtRight: 24 },
-      commercial: { cqWidth: 178, cqHeight: 89, dateTop: 5.5, dateLeft: 128, dateSpacing: 0.8, dateBoxWidth: 4.8, dateFontSize: 13.5, dateFormat: 'skip_20', crossTop: 4, crossLeft: 6, crossWidth: 45, payeeTop: 20, payeeLeft: 22, wordsTop: 30, wordsLeft: 22, amtTop: 37, amtRight: 24 },
-      sampath: { cqWidth: 178, cqHeight: 89, dateTop: 4.5, dateLeft: 128, dateSpacing: 0.8, dateBoxWidth: 4.8, dateFontSize: 13.5, dateFormat: 'skip_20', crossTop: 4, crossLeft: 6, crossWidth: 45, payeeTop: 19, payeeLeft: 22, wordsTop: 29, wordsLeft: 22, amtTop: 37, amtRight: 24 },
-      hnb: { cqWidth: 178, cqHeight: 89, dateTop: 5.0, dateLeft: 126, dateSpacing: 0.8, dateBoxWidth: 4.8, dateFontSize: 13.5, dateFormat: 'skip_20', crossTop: 4, crossLeft: 6, crossWidth: 45, payeeTop: 19, payeeLeft: 22, wordsTop: 29, wordsLeft: 22, amtTop: 36, amtRight: 24 },
-      boc: { cqWidth: 178, cqHeight: 89, dateTop: 5.0, dateLeft: 127, dateSpacing: 0.8, dateBoxWidth: 4.8, dateFontSize: 13.5, dateFormat: 'skip_20', crossTop: 4, crossLeft: 6, crossWidth: 45, payeeTop: 20, payeeLeft: 20, wordsTop: 30, wordsLeft: 20, amtTop: 37, amtRight: 24 }
+      ntb: { dateTop: 5.0, dateLeft: 132, dateSpacing: 0.8, dateBoxWidth: 4.8, dateFontSize: 13.5, dateFormat: 'skip_20', crossTop: 4, crossLeft: 6, crossWidth: 45, payeeTop: 20, payeeLeft: 22, wordsTop: 30, wordsLeft: 22, amtTop: 42, amtRight: 24 },
+      commercial: { dateTop: 5.5, dateLeft: 128, dateSpacing: 0.8, dateBoxWidth: 4.8, dateFontSize: 13.5, dateFormat: 'skip_20', crossTop: 4, crossLeft: 6, crossWidth: 45, payeeTop: 20, payeeLeft: 22, wordsTop: 31, wordsLeft: 22, amtTop: 36, amtRight: 36 },
+      sampath: { dateTop: 3, dateLeft: 128, dateSpacing: 0.8, dateBoxWidth: 4.8, dateFontSize: 13.5, dateFormat: 'skip_20', crossTop: 4, crossLeft: 6, crossWidth: 45, payeeTop: 18, payeeLeft: 22, wordsTop: 28, wordsLeft: 22, amtTop: 36, amtRight: 36 },
+      hnb: { dateTop: 4.5, dateLeft: 126, dateSpacing: 0.8, dateBoxWidth: 4.8, dateFontSize: 13.5, dateFormat: 'skip_20', crossTop: 4, crossLeft: 6, crossWidth: 45, payeeTop: 19, payeeLeft: 22, wordsTop: 29, wordsLeft: 22, amtTop: 35, amtRight: 34 },
+      boc: { dateTop: 5, dateLeft: 127, dateSpacing: 0.8, dateBoxWidth: 4.8, dateFontSize: 13.5, dateFormat: 'skip_20', crossTop: 4, crossLeft: 6, crossWidth: 45, payeeTop: 21, payeeLeft: 20, wordsTop: 32, wordsLeft: 20, amtTop: 37, amtRight: 35 },
+      seylan: { dateTop: 5.5, dateLeft: 128, dateSpacing: 0.8, dateBoxWidth: 4.8, dateFontSize: 13.5, dateFormat: 'skip_20', crossTop: 4, crossLeft: 6, crossWidth: 45, payeeTop: 20, payeeLeft: 22, wordsTop: 30, wordsLeft: 22, amtTop: 36, amtRight: 36 }
     };
 
     let currentRecord = {
@@ -1319,112 +1223,24 @@
       return String(s).replace(/[&<>"']/g, m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
     }
 
-    function onFeedModeChange() {
-      const mode = (document.getElementById('cqFeedMode') && document.getElementById('cqFeedMode').value) || 'dl_horiz';
-      document.body.classList.remove(
-        'feed-vert-90', 'feed-vert-270', 'feed-horiz', 'feed-a4'
-      );
-
-      let label = '✉️ Envelope DL (Horizontal Landscape 0, 0)';
-      let masterTop = 0;
-      let masterLeft = 0;
-      let pageCss = '@page { size: landscape; margin: 0mm !important; }';
-
-      if (mode === 'dl_horiz') {
-        document.body.classList.add('feed-horiz');
-        label = '✉️ Envelope DL — Horizontal (Standard 0, 0)';
-        pageCss = '@page { size: landscape; margin: 0mm !important; }';
-        masterTop = 0;
-        masterLeft = 0;
-      } else if (mode === 'dl_horiz_0') {
-        document.body.classList.add('feed-horiz');
-        label = '✉️ Envelope DL — Zero Offset (0mm Top, 0mm Left)';
-        pageCss = '@page { size: landscape; margin: 0mm !important; }';
-        masterTop = 0;
-        masterLeft = 0;
-      } else if (mode === 'dl_horiz_center') {
-        document.body.classList.add('feed-horiz');
-        label = '✉️ Envelope DL — Centered (+10.5mm Top, +21mm Left)';
-        pageCss = '@page { size: landscape; margin: 0mm !important; }';
-        masterTop = 10.5;
-        masterLeft = 21;
-      } else if (mode === 'a4') {
-        document.body.classList.add('feed-a4');
-        label = '📄 Standard A4 Paper (Landscape Top-Left: 0, 0)';
-        pageCss = '@page { size: landscape; margin: 0mm !important; }';
-        masterTop = 0;
-        masterLeft = 0;
-      } else if (mode === 'cheque_direct') {
-        document.body.classList.add('feed-horiz');
-        label = '🏦 Exact Cheque Direct (178mm × 89mm Landscape)';
-        pageCss = '@page { size: 178mm 89mm landscape; margin: 0mm !important; }';
-        masterTop = 0;
-        masterLeft = 0;
-      } else if (mode === 'dl_vert_90' || mode === 'vert_90') {
-        document.body.classList.add('feed-vert-90');
-        label = '⬇️ Vertical 90° (Narrow 89mm Edge — Flap / Left Tray)';
-        pageCss = '@page { size: portrait; margin: 0mm !important; }';
-        masterTop = 0;
-        masterLeft = 0;
-      } else if (mode === 'vert_270') {
-        document.body.classList.add('feed-vert-270');
-        label = '🔄 Vertical Feed Reversed 270°';
-        pageCss = '@page { size: portrait; margin: 0mm !important; }';
-        masterTop = 0;
-        masterLeft = 0;
-      }
-
-      // Update dynamic print style in head
-      let styleEl = document.getElementById('dynamicPrintStyle');
-      if (!styleEl) {
-        styleEl = document.createElement('style');
-        styleEl.id = 'dynamicPrintStyle';
-        document.head.appendChild(styleEl);
-      }
-      styleEl.textContent = `@media print { ${pageCss} }`;
-
-      if (document.getElementById('feedStatusText')) {
-        document.getElementById('feedStatusText').textContent = label;
-      }
-
-      // Apply default offsets for this feed mode
-      if (document.getElementById('calMasterTop')) document.getElementById('calMasterTop').value = masterTop;
-      if (document.getElementById('calMasterLeft')) document.getElementById('calMasterLeft').value = masterLeft;
-
-      localStorage.setItem('pw_feed_mode', mode);
-      updateCalib();
-    }
-
     function setMasterOffset(top, left) {
       if (document.getElementById('calMasterTop')) document.getElementById('calMasterTop').value = top;
       if (document.getElementById('calMasterLeft')) document.getElementById('calMasterLeft').value = left;
       updateCalib();
-    }
-
-    function nudgeMaster(dTop, dLeft) {
-      const curTop = parseFloat(document.getElementById('calMasterTop')?.value || 0);
-      const curLeft = parseFloat(document.getElementById('calMasterLeft')?.value || 0);
-      const newTop = Math.max(0, curTop + dTop);
-      const newLeft = Math.max(0, curLeft + dLeft);
-      setMasterOffset(newTop, newLeft);
-      toast(`Nudged: Top ${newTop}mm, Left ${newLeft}mm`);
+      toast(`Shifted cheque: Top ${top}mm, Left ${left}mm`);
     }
 
     function updateCalib() {
-      const cqWidth = parseFloat(document.getElementById('calCqWidth')?.value || 178);
-      const cqHeight = parseFloat(document.getElementById('calCqHeight')?.value || 89);
       const mTop = parseFloat(document.getElementById('calMasterTop')?.value || 0);
       const mLeft = parseFloat(document.getElementById('calMasterLeft')?.value || 0);
-
-      document.documentElement.style.setProperty('--cq-width', cqWidth + 'mm');
-      document.documentElement.style.setProperty('--cq-height', cqHeight + 'mm');
-      document.documentElement.style.setProperty('--master-top', mTop + 'mm');
-      document.documentElement.style.setProperty('--master-left', mLeft + 'mm');
-
-      if (document.getElementById('valCqSize')) document.getElementById('valCqSize').textContent = `${cqWidth}mm × ${cqHeight}mm`;
-      if (document.getElementById('valCqWidth')) document.getElementById('valCqWidth').textContent = `${cqWidth}mm`;
-      if (document.getElementById('valCqHeight')) document.getElementById('valCqHeight').textContent = `${cqHeight}mm`;
-      if (document.getElementById('valMaster')) document.getElementById('valMaster').textContent = `Top: ${mTop}mm, Left: ${mLeft}mm`;
+      if (document.getElementById('valMaster')) {
+        document.getElementById('valMaster').textContent = `Top: ${mTop}mm, Left: ${mLeft}mm`;
+      }
+      const wrapper = document.getElementById('fullChequeWrapper');
+      if (wrapper) {
+        wrapper.style.marginTop = mTop + 'mm';
+        wrapper.style.marginLeft = mLeft + 'mm';
+      }
 
       const dTop = document.getElementById('calDateTop').value;
       const dLeft = document.getElementById('calDateLeft').value;
@@ -1484,25 +1300,15 @@
       amtEl.style.right = aRight + 'mm';
     }
 
-    function applyBankPreset(presetKey, forceDefault = false) {
-      let p = BANK_PRESETS[presetKey] || BANK_PRESETS.seylan || BANK_PRESETS.ntb;
-      if (!forceDefault) {
-        const saved = localStorage.getItem('pw_calib_' + presetKey);
-        if (saved) {
-          try {
-            const parsed = JSON.parse(saved);
-            // Defensive sanity check: If dateTop > 30, it was corrupted/stale -> discard
-            if (parsed.dateTop && Number(parsed.dateTop) <= 30) {
-              p = { ...p, ...parsed };
-            } else {
-              localStorage.removeItem('pw_calib_' + presetKey);
-            }
-          } catch (_) {}
-        }
+    function applyBankPreset(presetKey) {
+      const saved = localStorage.getItem('pw_calib_' + presetKey);
+      let p = BANK_PRESETS[presetKey] || BANK_PRESETS.ntb;
+      if (saved) {
+        try { p = { ...p, ...JSON.parse(saved) }; } catch (_) {}
       }
 
-      if (document.getElementById('calCqWidth')) document.getElementById('calCqWidth').value = p.cqWidth || 178;
-      if (document.getElementById('calCqHeight')) document.getElementById('calCqHeight').value = p.cqHeight || 89;
+      if (document.getElementById('calMasterTop')) document.getElementById('calMasterTop').value = p.masterTop || 0;
+      if (document.getElementById('calMasterLeft')) document.getElementById('calMasterLeft').value = p.masterLeft || 0;
       if (document.getElementById('calDateTop')) document.getElementById('calDateTop').value = p.dateTop;
       if (document.getElementById('calDateLeft')) document.getElementById('calDateLeft').value = p.dateLeft;
       if (document.getElementById('calDateSpacing')) document.getElementById('calDateSpacing').value = p.dateSpacing || 0.8;
@@ -1523,19 +1329,17 @@
     }
 
     function resetCalibration() {
-      const bank = document.getElementById('bankPreset')?.value || 'seylan';
-      localStorage.removeItem('pw_calib_' + bank);
+      applyBankPreset('ntb');
+      document.getElementById('bankPreset').value = 'ntb';
       if (document.getElementById('calMasterTop')) document.getElementById('calMasterTop').value = 0;
       if (document.getElementById('calMasterLeft')) document.getElementById('calMasterLeft').value = 0;
-      applyBankPreset(bank, true);
-      toast('✅ Reset to calibrated ' + bank + ' defaults (0, 0)!');
+      updateCalib();
+      toast('Reset to Nations Trust Bank (NTB) preset');
     }
 
     function saveBankProfile() {
       const bank = document.getElementById('bankPreset').value;
       const cfg = {
-        cqWidth: document.getElementById('calCqWidth')?.value || 178,
-        cqHeight: document.getElementById('calCqHeight')?.value || 89,
         masterTop: document.getElementById('calMasterTop')?.value || 0,
         masterLeft: document.getElementById('calMasterLeft')?.value || 0,
         dateTop: document.getElementById('calDateTop').value,
@@ -1810,12 +1614,9 @@
       }
     }
 
-    // Initialize defaults
+    // Set today date by default
     document.getElementById('cqDateInput').value = new Date().toISOString().slice(0, 10);
-    const savedFeedMode = localStorage.getItem('pw_feed_mode') || 'dl_horiz';
-    if (document.getElementById('cqFeedMode')) document.getElementById('cqFeedMode').value = savedFeedMode;
-    onFeedModeChange();
-    applyBankPreset('seylan');
+    applyBankPreset('ntb');
     updateLiveCheque();
     checkAuth();
     initFromUrlParams();
