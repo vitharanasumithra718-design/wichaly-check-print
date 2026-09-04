@@ -493,13 +493,16 @@
     /* =========================================================================
        PRINT RULES (PERFECT ZERO MARGIN CHEQUE PRINT WITH FEED ROTATIONS)
        ========================================================================= */
+    @page {
+      size: auto;
+      margin: 0mm !important;
+    }
+
     @media print {
-      body.feed-vert-90 {
-        @page {
-          size: portrait;
-          margin: 0mm !important;
-        }
+      @page {
+        margin: 0mm !important;
       }
+
       body.feed-vert-90 .full-cheque-wrapper {
         width: var(--cq-height, 89mm) !important;
         height: var(--cq-width, 178mm) !important;
@@ -516,12 +519,6 @@
         overflow: visible !important;
       }
 
-      body.feed-vert-270 {
-        @page {
-          size: portrait;
-          margin: 0mm !important;
-        }
-      }
       body.feed-vert-270 .full-cheque-wrapper {
         width: var(--cq-height, 89mm) !important;
         height: var(--cq-width, 178mm) !important;
@@ -538,12 +535,6 @@
         overflow: visible !important;
       }
 
-      body.feed-horiz, body.feed-a4 {
-        @page {
-          size: landscape;
-          margin: 0mm !important;
-        }
-      }
       body.feed-horiz .full-cheque-wrapper,
       body.feed-a4 .full-cheque-wrapper {
         width: var(--cq-width, 178mm) !important;
@@ -672,13 +663,13 @@
 
           <div class="ctrl-item">
             <label>🏦 Bank:</label>
-            <select id="bankPreset" onchange="applyBankPreset(this.value)" style="min-width:160px;">
-              <option value="ntb" selected>Nations Trust Bank (NTB)</option>
+            <select id="bankPreset" onchange="applyBankPreset(this.value)" style="min-width:170px;">
+              <option value="seylan" selected>Seylan Bank (Prime Business)</option>
+              <option value="ntb">Nations Trust Bank (NTB)</option>
               <option value="commercial">Commercial Bank</option>
               <option value="sampath">Sampath Bank</option>
               <option value="hnb">Hatton National Bank (HNB)</option>
               <option value="boc">Bank of Ceylon (BOC)</option>
-              <option value="seylan">Seylan Bank</option>
               <option value="custom">Custom Alignment</option>
             </select>
           </div>
@@ -686,10 +677,13 @@
           <div class="ctrl-item" style="background:#064e3b; border:1px solid #10b981; padding:4px 8px; border-radius:8px;">
             <label style="color:#6ee7b7; font-weight:700;">🖨️ Printer Feed Mode:</label>
             <select id="cqFeedMode" onchange="onFeedModeChange()" style="font-size:12px; padding:4px 6px; font-weight:700; background:#0f172a; color:#34d399; border:1px solid #059669; border-radius:6px;">
-              <option value="vert_90" selected>⬇️ Vertical Feed (Narrow 89mm Edge — As in Photo)</option>
-              <option value="horiz">➡️ Horizontal Feed (Wide 178mm Edge)</option>
+              <option value="dl_horiz" selected>✉️ Envelope DL (Horizontal / Landscape — Flap / Left Feed)</option>
+              <option value="dl_horiz_center">✉️ Envelope DL (Horizontal / Landscape — Centered Feed)</option>
+              <option value="dl_vert_90">⬇️ Envelope DL (Vertical 90° — Narrow Edge Flap Feed)</option>
+              <option value="dl_vert_90_center">⬇️ Envelope DL (Vertical 90° — Narrow Edge Centered)</option>
+              <option value="a4">📄 Standard A4 Paper (Landscape Top-Left)</option>
+              <option value="cheque_direct">🏦 Exact Cheque Size (178mm × 89mm Landscape)</option>
               <option value="vert_270">🔄 Vertical Feed (Reversed 270°)</option>
-              <option value="a4">📄 Standard A4 Top-Left (0, 0)</option>
             </select>
           </div>
 
@@ -917,10 +911,12 @@
               <span style="width:36px;">Left:</span>
               <input type="range" id="calMasterLeft" min="0" max="150" step="1" value="0" oninput="updateCalib()">
             </div>
-            <div style="display:flex; gap:4px; margin-top:6px;">
-              <button class="btn btn-ghost btn-sm" style="flex:1; font-size:10.5px; padding:3px 4px;" onclick="setMasterOffset(0, 0)">Top (0mm)</button>
-              <button class="btn btn-ghost btn-sm" style="flex:1; font-size:10.5px; padding:3px 4px;" onclick="setMasterOffset(30, 0)">Mid (30mm)</button>
-              <button class="btn btn-ghost btn-sm" style="flex:1; font-size:10.5px; padding:3px 4px;" onclick="setMasterOffset(60, 0)">Center (60mm)</button>
+            <div style="display:flex; flex-wrap:wrap; gap:4px; margin-top:6px;">
+              <button class="btn btn-ghost btn-sm" style="flex:1; font-size:10px; padding:3px 4px;" onclick="setMasterOffset(0, 0)" title="Zero Offset (Left Flap)">🎯 Left (0,0)</button>
+              <button class="btn btn-ghost btn-sm" style="flex:1; font-size:10px; padding:3px 4px;" onclick="setMasterOffset(10.5, 21)" title="Envelope DL Landscape Centered">✉️ DL Horiz Mid</button>
+              <button class="btn btn-ghost btn-sm" style="flex:1; font-size:10px; padding:3px 4px;" onclick="setMasterOffset(0, 10.5)" title="Envelope DL Vertical Centered">✉️ DL Vert Mid</button>
+              <button class="btn btn-ghost btn-sm" style="flex:1; font-size:10px; padding:3px 4px;" onclick="nudgeMaster(5, 0)">⬇️ +5mm</button>
+              <button class="btn btn-ghost btn-sm" style="flex:1; font-size:10px; padding:3px 4px;" onclick="nudgeMaster(-5, 0)">⬆️ -5mm</button>
             </div>
           </div>
 
@@ -1074,14 +1070,14 @@
       document.getElementById('fileWarnBanner').classList.add('show');
     }
 
-    // Bank Calibration Presets (Calibrated to Sri Lankan physical cheque leaves)
+    // Bank Calibration Presets (Calibrated to Sri Lankan physical cheque leaves: 178mm x 89mm)
     const BANK_PRESETS = {
-      ntb: { cqWidth: 178, cqHeight: 89, dateTop: 5.5, dateLeft: 132, dateSpacing: 0.8, dateBoxWidth: 4.8, dateFontSize: 13.5, dateFormat: 'skip_20', crossTop: 4, crossLeft: 6, crossWidth: 45, payeeTop: 20, payeeLeft: 22, wordsTop: 29.5, wordsLeft: 22, amtTop: 40, amtRight: 24 },
-      seylan: { cqWidth: 178, cqHeight: 89, dateTop: 62.0, dateLeft: 125, dateSpacing: 0.8, dateBoxWidth: 4.8, dateFontSize: 13.5, dateFormat: 'skip_20', crossTop: 4, crossLeft: 6, crossWidth: 45, payeeTop: 11, payeeLeft: 38, wordsTop: 20, wordsLeft: 38, amtTop: 58, amtRight: 55 },
-      commercial: { cqWidth: 178, cqHeight: 89, dateTop: 5.5, dateLeft: 128, dateSpacing: 0.8, dateBoxWidth: 4.8, dateFontSize: 13.5, dateFormat: 'skip_20', crossTop: 4, crossLeft: 6, crossWidth: 45, payeeTop: 20, payeeLeft: 22, wordsTop: 31, wordsLeft: 22, amtTop: 36, amtRight: 36 },
-      sampath: { cqWidth: 178, cqHeight: 89, dateTop: 3.5, dateLeft: 128, dateSpacing: 0.8, dateBoxWidth: 4.8, dateFontSize: 13.5, dateFormat: 'skip_20', crossTop: 4, crossLeft: 6, crossWidth: 45, payeeTop: 18, payeeLeft: 22, wordsTop: 28, wordsLeft: 22, amtTop: 36, amtRight: 36 },
-      hnb: { cqWidth: 178, cqHeight: 89, dateTop: 4.5, dateLeft: 126, dateSpacing: 0.8, dateBoxWidth: 4.8, dateFontSize: 13.5, dateFormat: 'skip_20', crossTop: 4, crossLeft: 6, crossWidth: 45, payeeTop: 19, payeeLeft: 22, wordsTop: 29, wordsLeft: 22, amtTop: 35, amtRight: 34 },
-      boc: { cqWidth: 178, cqHeight: 89, dateTop: 5.0, dateLeft: 127, dateSpacing: 0.8, dateBoxWidth: 4.8, dateFontSize: 13.5, dateFormat: 'skip_20', crossTop: 4, crossLeft: 6, crossWidth: 45, payeeTop: 21, payeeLeft: 20, wordsTop: 32, wordsLeft: 20, amtTop: 37, amtRight: 35 }
+      seylan: { cqWidth: 178, cqHeight: 89, dateTop: 5.5, dateLeft: 130, dateSpacing: 0.8, dateBoxWidth: 4.8, dateFontSize: 13.5, dateFormat: 'skip_20', crossTop: 4, crossLeft: 6, crossWidth: 45, payeeTop: 20, payeeLeft: 22, wordsTop: 29.5, wordsLeft: 22, amtTop: 38, amtRight: 24 },
+      ntb: { cqWidth: 178, cqHeight: 89, dateTop: 5.5, dateLeft: 132, dateSpacing: 0.8, dateBoxWidth: 4.8, dateFontSize: 13.5, dateFormat: 'skip_20', crossTop: 4, crossLeft: 6, crossWidth: 45, payeeTop: 20, payeeLeft: 22, wordsTop: 29.5, wordsLeft: 22, amtTop: 38, amtRight: 24 },
+      commercial: { cqWidth: 178, cqHeight: 89, dateTop: 5.5, dateLeft: 128, dateSpacing: 0.8, dateBoxWidth: 4.8, dateFontSize: 13.5, dateFormat: 'skip_20', crossTop: 4, crossLeft: 6, crossWidth: 45, payeeTop: 20, payeeLeft: 22, wordsTop: 30, wordsLeft: 22, amtTop: 37, amtRight: 24 },
+      sampath: { cqWidth: 178, cqHeight: 89, dateTop: 4.5, dateLeft: 128, dateSpacing: 0.8, dateBoxWidth: 4.8, dateFontSize: 13.5, dateFormat: 'skip_20', crossTop: 4, crossLeft: 6, crossWidth: 45, payeeTop: 19, payeeLeft: 22, wordsTop: 29, wordsLeft: 22, amtTop: 37, amtRight: 24 },
+      hnb: { cqWidth: 178, cqHeight: 89, dateTop: 5.0, dateLeft: 126, dateSpacing: 0.8, dateBoxWidth: 4.8, dateFontSize: 13.5, dateFormat: 'skip_20', crossTop: 4, crossLeft: 6, crossWidth: 45, payeeTop: 19, payeeLeft: 22, wordsTop: 29, wordsLeft: 22, amtTop: 36, amtRight: 24 },
+      boc: { cqWidth: 178, cqHeight: 89, dateTop: 5.0, dateLeft: 127, dateSpacing: 0.8, dateBoxWidth: 4.8, dateFontSize: 13.5, dateFormat: 'skip_20', crossTop: 4, crossLeft: 6, crossWidth: 45, payeeTop: 20, payeeLeft: 20, wordsTop: 30, wordsLeft: 20, amtTop: 37, amtRight: 24 }
     };
 
     let currentRecord = {
@@ -1321,25 +1317,77 @@
     }
 
     function onFeedModeChange() {
-      const mode = (document.getElementById('cqFeedMode') && document.getElementById('cqFeedMode').value) || 'vert_90';
-      document.body.classList.remove('feed-vert-90', 'feed-vert-270', 'feed-horiz', 'feed-a4');
-      let label = '⬇️ Vertical Feed (Narrow 89mm Edge — As in Photo)';
-      if (mode === 'vert_90') {
+      const mode = (document.getElementById('cqFeedMode') && document.getElementById('cqFeedMode').value) || 'dl_horiz';
+      document.body.classList.remove(
+        'feed-vert-90', 'feed-vert-270', 'feed-horiz', 'feed-a4'
+      );
+
+      let label = '✉️ Envelope DL (Horizontal / Landscape — Flap / Left Feed)';
+      let masterTop = 0;
+      let masterLeft = 0;
+      let pageCss = '@page { size: landscape; margin: 0mm !important; }';
+
+      if (mode === 'dl_horiz' || mode === 'horiz') {
+        document.body.classList.add('feed-horiz');
+        label = '✉️ Envelope DL — Horizontal / Landscape (Flap / Left Tray Guide)';
+        pageCss = '@page { size: landscape; margin: 0mm !important; }';
+        masterTop = 0;
+        masterLeft = 0;
+      } else if (mode === 'dl_horiz_center') {
+        document.body.classList.add('feed-horiz');
+        label = '✉️ Envelope DL — Horizontal / Landscape (Center Tray Guide)';
+        pageCss = '@page { size: landscape; margin: 0mm !important; }';
+        masterTop = 10.5;
+        masterLeft = 21;
+      } else if (mode === 'dl_vert_90' || mode === 'vert_90') {
         document.body.classList.add('feed-vert-90');
-        label = '⬇️ Vertical Feed 90° (Narrow 89mm Edge — As in Photo)';
+        label = '⬇️ Envelope DL — Vertical 90° (Narrow 89mm Edge — Flap / Left Tray)';
+        pageCss = '@page { size: portrait; margin: 0mm !important; }';
+        masterTop = 0;
+        masterLeft = 0;
+      } else if (mode === 'dl_vert_90_center') {
+        document.body.classList.add('feed-vert-90');
+        label = '⬇️ Envelope DL — Vertical 90° (Narrow 89mm Edge — Center Tray)';
+        pageCss = '@page { size: portrait; margin: 0mm !important; }';
+        masterTop = 0;
+        masterLeft = 10.5;
+      } else if (mode === 'a4') {
+        document.body.classList.add('feed-a4');
+        label = '📄 Standard A4 Paper (Landscape Top-Left: 0, 0)';
+        pageCss = '@page { size: landscape; margin: 0mm !important; }';
+        masterTop = 0;
+        masterLeft = 0;
+      } else if (mode === 'cheque_direct') {
+        document.body.classList.add('feed-horiz');
+        label = '🏦 Exact Cheque Direct (178mm × 89mm Landscape)';
+        pageCss = '@page { size: 178mm 89mm landscape; margin: 0mm !important; }';
+        masterTop = 0;
+        masterLeft = 0;
       } else if (mode === 'vert_270') {
         document.body.classList.add('feed-vert-270');
         label = '🔄 Vertical Feed Reversed 270°';
-      } else if (mode === 'horiz') {
-        document.body.classList.add('feed-horiz');
-        label = '➡️ Horizontal Feed (Wide 178mm Edge)';
-      } else if (mode === 'a4') {
-        document.body.classList.add('feed-a4');
-        label = '📄 Standard A4 Top-Left (0, 0)';
+        pageCss = '@page { size: portrait; margin: 0mm !important; }';
+        masterTop = 0;
+        masterLeft = 0;
       }
+
+      // Update dynamic print style in head
+      let styleEl = document.getElementById('dynamicPrintStyle');
+      if (!styleEl) {
+        styleEl = document.createElement('style');
+        styleEl.id = 'dynamicPrintStyle';
+        document.head.appendChild(styleEl);
+      }
+      styleEl.textContent = `@media print { ${pageCss} }`;
+
       if (document.getElementById('feedStatusText')) {
         document.getElementById('feedStatusText').textContent = label;
       }
+
+      // Apply default offsets for this feed mode
+      if (document.getElementById('calMasterTop')) document.getElementById('calMasterTop').value = masterTop;
+      if (document.getElementById('calMasterLeft')) document.getElementById('calMasterLeft').value = masterLeft;
+
       localStorage.setItem('pw_feed_mode', mode);
       updateCalib();
     }
@@ -1348,6 +1396,15 @@
       if (document.getElementById('calMasterTop')) document.getElementById('calMasterTop').value = top;
       if (document.getElementById('calMasterLeft')) document.getElementById('calMasterLeft').value = left;
       updateCalib();
+    }
+
+    function nudgeMaster(dTop, dLeft) {
+      const curTop = parseFloat(document.getElementById('calMasterTop')?.value || 0);
+      const curLeft = parseFloat(document.getElementById('calMasterLeft')?.value || 0);
+      const newTop = Math.max(0, curTop + dTop);
+      const newLeft = Math.max(0, curLeft + dLeft);
+      setMasterOffset(newTop, newLeft);
+      toast(`Nudged: Top ${newTop}mm, Left ${newLeft}mm`);
     }
 
     function updateCalib() {
@@ -1424,17 +1481,25 @@
       amtEl.style.right = aRight + 'mm';
     }
 
-    function applyBankPreset(presetKey) {
-      const saved = localStorage.getItem('pw_calib_' + presetKey);
-      let p = BANK_PRESETS[presetKey] || BANK_PRESETS.ntb;
-      if (saved) {
-        try { p = { ...p, ...JSON.parse(saved) }; } catch (_) {}
+    function applyBankPreset(presetKey, forceDefault = false) {
+      let p = BANK_PRESETS[presetKey] || BANK_PRESETS.seylan || BANK_PRESETS.ntb;
+      if (!forceDefault) {
+        const saved = localStorage.getItem('pw_calib_' + presetKey);
+        if (saved) {
+          try {
+            const parsed = JSON.parse(saved);
+            // Defensive sanity check: If dateTop > 30, it was corrupted/stale -> discard
+            if (parsed.dateTop && Number(parsed.dateTop) <= 30) {
+              p = { ...p, ...parsed };
+            } else {
+              localStorage.removeItem('pw_calib_' + presetKey);
+            }
+          } catch (_) {}
+        }
       }
 
       if (document.getElementById('calCqWidth')) document.getElementById('calCqWidth').value = p.cqWidth || 178;
       if (document.getElementById('calCqHeight')) document.getElementById('calCqHeight').value = p.cqHeight || 89;
-      if (document.getElementById('calMasterTop')) document.getElementById('calMasterTop').value = p.masterTop || 0;
-      if (document.getElementById('calMasterLeft')) document.getElementById('calMasterLeft').value = p.masterLeft || 0;
       if (document.getElementById('calDateTop')) document.getElementById('calDateTop').value = p.dateTop;
       if (document.getElementById('calDateLeft')) document.getElementById('calDateLeft').value = p.dateLeft;
       if (document.getElementById('calDateSpacing')) document.getElementById('calDateSpacing').value = p.dateSpacing || 0.8;
@@ -1455,14 +1520,10 @@
     }
 
     function resetCalibration() {
-      applyBankPreset('ntb');
-      document.getElementById('bankPreset').value = 'ntb';
-      if (document.getElementById('calCqWidth')) document.getElementById('calCqWidth').value = 178;
-      if (document.getElementById('calCqHeight')) document.getElementById('calCqHeight').value = 89;
-      if (document.getElementById('calMasterTop')) document.getElementById('calMasterTop').value = 0;
-      if (document.getElementById('calMasterLeft')) document.getElementById('calMasterLeft').value = 0;
-      updateCalib();
-      toast('Reset to Nations Trust Bank (NTB) preset');
+      const bank = document.getElementById('bankPreset')?.value || 'seylan';
+      applyBankPreset(bank, true);
+      localStorage.removeItem('pw_calib_' + bank);
+      toast('Reset to default preset for ' + bank);
     }
 
     function saveBankProfile() {
@@ -1746,10 +1807,10 @@
 
     // Initialize defaults
     document.getElementById('cqDateInput').value = new Date().toISOString().slice(0, 10);
-    const savedFeedMode = localStorage.getItem('pw_feed_mode') || 'vert_90';
+    const savedFeedMode = localStorage.getItem('pw_feed_mode') || 'dl_horiz';
     if (document.getElementById('cqFeedMode')) document.getElementById('cqFeedMode').value = savedFeedMode;
     onFeedModeChange();
-    applyBankPreset('ntb');
+    applyBankPreset('seylan');
     updateLiveCheque();
     checkAuth();
     initFromUrlParams();
