@@ -480,19 +480,23 @@
     }
     .toast.show { opacity: 1; transform: none; }
 
-    /* =========================================================================
-       PRINT RULES (PERFECT ZERO MARGIN CHEQUE PRINT)
-       ========================================================================= */
-    @page {
-      size: landscape;
-      margin: 0mm !important;
+    :root {
+      --master-top: 0mm;
+      --master-left: 60.5mm;
     }
 
+    /* Screen rotated preview if checked */
+    .cheque-paper.screen-rotated {
+      transform-origin: top left;
+      transform: rotate(-90deg) translate(-178mm, 0) !important;
+      margin-left: var(--master-left, 60.5mm) !important;
+      margin-top: var(--master-top, 0mm) !important;
+    }
+
+    /* =========================================================================
+       PRINT RULES (ZERO MARGIN DUAL-FEED PRINT ENGINE)
+       ========================================================================= */
     @media print {
-      @page {
-        size: landscape;
-        margin: 0mm !important;
-      }
       body, html {
         background: transparent !important;
         margin: 0 !important;
@@ -535,6 +539,11 @@
         background: transparent !important;
         page-break-inside: avoid !important;
         page-break-after: avoid !important;
+        position: absolute !important;
+        top: 0 !important;
+        left: 0 !important;
+        margin: 0 !important;
+        padding: 0 !important;
       }
 
       .cheque-paper {
@@ -550,14 +559,37 @@
       body.mode-cheque-single .counterfoil-paper {
         display: none !important;
       }
-      body.mode-cheque-single .cheque-paper {
+
+      /* FEED MODE 1: VERTICAL CLAMPED TRAY (Canon 89mm narrow edge — Photo 2) */
+      body.feed-vert-canon .cheque-paper {
+        width: 178mm !important;
+        height: 89mm !important;
+        position: absolute !important;
+        transform-origin: top left !important;
+        transform: rotate(-90deg) translate(-178mm, 0) !important;
+        top: var(--master-top, 0mm) !important;
+        left: var(--master-left, 60.5mm) !important;
+      }
+
+      /* FEED MODE 2: HORIZONTAL FEED (178mm wide edge — Photo 1) */
+      body.feed-horizontal .cheque-paper {
         width: 7.5in !important;
         height: 3.875in !important;
+        position: relative !important;
+        margin-top: var(--master-top, 0mm) !important;
+        margin-left: var(--master-left, 0mm) !important;
+        transform: none !important;
       }
     }
   </style>
+  <style id="printPageStyle">
+    @page {
+      size: portrait;
+      margin: 0mm !important;
+    }
+  </style>
 </head>
-<body class="mode-cheque-single">
+<body class="mode-cheque-single feed-vert-canon">
 
   <!-- Warning when user double clicks index.html directly from file system -->
   <div class="file-warn-banner" id="fileWarnBanner">
@@ -627,6 +659,17 @@
               <option value="full_8">DD MM YYYY (Print All 8 Digits)</option>
               <option value="compact_6">DD MM YY (6 Digits Compact)</option>
             </select>
+          </div>
+
+          <div class="ctrl-item">
+            <label>🖨️ Feed Direction:</label>
+            <select id="cqFeedMode" onchange="updateFeedMode()" style="font-weight:700; background:#0f172a; color:#38bdf8; border:1px solid #334155; border-radius:6px; padding:4px 8px;">
+              <option value="vert_canon" selected>⬇️ Canon Clamped Tray (89mm Narrow Edge — Photo 2)</option>
+              <option value="horizontal">↔️ Horizontal Feed (178mm Wide Edge — Photo 1)</option>
+            </select>
+            <label style="font-size:11px; color:#94a3b8; display:inline-flex; align-items:center; gap:3px; cursor:pointer;" title="Rotate preview on screen to match printer feed">
+              <input type="checkbox" id="chkRotPreview" onchange="toggleRotPreview()"> 🔄 Rotate Screen View
+            </label>
           </div>
 
           <div class="ctrl-item">
@@ -810,20 +853,27 @@
           <div class="calib-group" style="background:#0f2b48; border:1px solid #0284c7; margin-bottom:12px;">
             <div class="calib-header" style="color:#38bdf8;">
               <span>🎯 Whole Cheque Shift</span>
-              <span id="valMaster">Top: 0mm, Left: 0mm</span>
+              <span id="valMaster">Top: 0mm, Left: 60.5mm</span>
             </div>
             <div class="calib-row">
               <span style="width:36px;">Top:</span>
-              <input type="range" id="calMasterTop" min="0" max="200" step="1" value="0" oninput="updateCalib()">
+              <input type="range" id="calMasterTop" min="0" max="200" step="0.5" value="0" oninput="updateCalib()">
+              <span class="val" id="valMasterTop" style="width:40px; font-size:11px;">0mm</span>
             </div>
             <div class="calib-row">
               <span style="width:36px;">Left:</span>
-              <input type="range" id="calMasterLeft" min="0" max="150" step="1" value="0" oninput="updateCalib()">
+              <input type="range" id="calMasterLeft" min="0" max="150" step="0.5" value="60.5" oninput="updateCalib()">
+              <span class="val" id="valMasterLeft" style="width:40px; font-size:11px;">60.5mm</span>
             </div>
             <div style="display:flex; gap:4px; margin-top:6px;">
-              <button class="btn btn-ghost btn-sm" style="flex:1; font-size:10.5px; padding:3px 4px;" onclick="setMasterOffset(0, 0)">Top (0mm)</button>
-              <button class="btn btn-ghost btn-sm" style="flex:1; font-size:10.5px; padding:3px 4px;" onclick="setMasterOffset(30, 0)">Mid (30mm)</button>
-              <button class="btn btn-ghost btn-sm" style="flex:1; font-size:10.5px; padding:3px 4px;" onclick="setMasterOffset(60, 0)">Center (60mm)</button>
+              <button class="btn btn-ghost btn-sm" style="flex:1; font-size:10px; padding:3px 2px;" onclick="setMasterOffset(0, 60.5)">Canon Center (60.5mm)</button>
+              <button class="btn btn-ghost btn-sm" style="flex:1; font-size:10px; padding:3px 2px;" onclick="setMasterOffset(0, 0)">Left Edge (0mm)</button>
+            </div>
+            <div style="display:flex; gap:4px; margin-top:6px;">
+              <button class="btn btn-secondary btn-sm" style="flex:1; font-size:10.5px; padding:2px 2px;" onclick="nudgeMaster(-1, 0)">▲ Top -1mm</button>
+              <button class="btn btn-secondary btn-sm" style="flex:1; font-size:10.5px; padding:2px 2px;" onclick="nudgeMaster(1, 0)">▼ Top +1mm</button>
+              <button class="btn btn-secondary btn-sm" style="flex:1; font-size:10.5px; padding:2px 2px;" onclick="nudgeMaster(0, -1)">◄ Left -1mm</button>
+              <button class="btn btn-secondary btn-sm" style="flex:1; font-size:10.5px; padding:2px 2px;" onclick="nudgeMaster(0, 1)">► Left +1mm</button>
             </div>
           </div>
 
@@ -1223,6 +1273,44 @@
       return String(s).replace(/[&<>"']/g, m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
     }
 
+    function updateFeedMode() {
+      const mode = document.getElementById('cqFeedMode')?.value || 'vert_canon';
+      const styleEl = document.getElementById('printPageStyle');
+      document.body.classList.remove('feed-vert-canon', 'feed-horizontal');
+
+      if (mode === 'vert_canon') {
+        document.body.classList.add('feed-vert-canon');
+        if (styleEl) styleEl.textContent = '@page { size: portrait; margin: 0mm !important; }';
+        const curLeft = parseFloat(document.getElementById('calMasterLeft')?.value || 0);
+        if (curLeft === 0) {
+          if (document.getElementById('calMasterLeft')) document.getElementById('calMasterLeft').value = 60.5;
+        }
+      } else {
+        document.body.classList.add('feed-horizontal');
+        if (styleEl) styleEl.textContent = '@page { size: landscape; margin: 0mm !important; }';
+        const curLeft = parseFloat(document.getElementById('calMasterLeft')?.value || 0);
+        if (curLeft === 60.5) {
+          if (document.getElementById('calMasterLeft')) document.getElementById('calMasterLeft').value = 0;
+        }
+      }
+      localStorage.setItem('pw_feed_mode', mode);
+      updateCalib();
+    }
+
+    function toggleRotPreview() {
+      const isRot = document.getElementById('chkRotPreview')?.checked;
+      const paper = document.getElementById('chequePaper');
+      const canvasCard = document.querySelector('.preview-canvas-card');
+      if (isRot) {
+        paper.classList.add('screen-rotated');
+        if (canvasCard) canvasCard.style.minHeight = '210mm';
+      } else {
+        paper.classList.remove('screen-rotated');
+        if (canvasCard) canvasCard.style.minHeight = '';
+      }
+      updateCalib();
+    }
+
     function setMasterOffset(top, left) {
       if (document.getElementById('calMasterTop')) document.getElementById('calMasterTop').value = top;
       if (document.getElementById('calMasterLeft')) document.getElementById('calMasterLeft').value = left;
@@ -1230,16 +1318,39 @@
       toast(`Shifted cheque: Top ${top}mm, Left ${left}mm`);
     }
 
+    function nudgeMaster(dTop, dLeft) {
+      const curTop = parseFloat(document.getElementById('calMasterTop')?.value || 0);
+      const curLeft = parseFloat(document.getElementById('calMasterLeft')?.value || 0);
+      const newTop = Math.max(0, Math.round((curTop + dTop) * 10) / 10);
+      const newLeft = Math.max(0, Math.round((curLeft + dLeft) * 10) / 10);
+      setMasterOffset(newTop, newLeft);
+    }
+
     function updateCalib() {
       const mTop = parseFloat(document.getElementById('calMasterTop')?.value || 0);
       const mLeft = parseFloat(document.getElementById('calMasterLeft')?.value || 0);
+
+      document.documentElement.style.setProperty('--master-top', mTop + 'mm');
+      document.documentElement.style.setProperty('--master-left', mLeft + 'mm');
+
       if (document.getElementById('valMaster')) {
         document.getElementById('valMaster').textContent = `Top: ${mTop}mm, Left: ${mLeft}mm`;
       }
+      if (document.getElementById('valMasterTop')) document.getElementById('valMasterTop').textContent = mTop + 'mm';
+      if (document.getElementById('valMasterLeft')) document.getElementById('valMasterLeft').textContent = mLeft + 'mm';
+
       const wrapper = document.getElementById('fullChequeWrapper');
+      const feedMode = document.getElementById('cqFeedMode')?.value || 'vert_canon';
+      const isRotPreview = document.getElementById('chkRotPreview')?.checked;
+
       if (wrapper) {
-        wrapper.style.marginTop = mTop + 'mm';
-        wrapper.style.marginLeft = mLeft + 'mm';
+        if (feedMode === 'horizontal' || !isRotPreview) {
+          wrapper.style.marginTop = mTop + 'mm';
+          wrapper.style.marginLeft = mLeft + 'mm';
+        } else {
+          wrapper.style.marginTop = '0mm';
+          wrapper.style.marginLeft = '0mm';
+        }
       }
 
       const dTop = document.getElementById('calDateTop').value;
@@ -1617,6 +1728,9 @@
     // Set today date by default
     document.getElementById('cqDateInput').value = new Date().toISOString().slice(0, 10);
     applyBankPreset('ntb');
+    const savedFeedMode = localStorage.getItem('pw_feed_mode') || 'vert_canon';
+    if (document.getElementById('cqFeedMode')) document.getElementById('cqFeedMode').value = savedFeedMode;
+    updateFeedMode();
     updateLiveCheque();
     checkAuth();
     initFromUrlParams();
