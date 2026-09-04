@@ -250,6 +250,7 @@
       font-family: 'Plus Jakarta Sans', sans-serif;
       user-select: none;
       position: relative;
+      transition: width 0.25s cubic-bezier(0.4, 0, 0.2, 1), height 0.25s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
     /* Counterfoil / Left Stub Paper */
@@ -270,13 +271,68 @@
     .cf-label { font-size: 9.5px; font-weight: 700; color: #475569; text-transform: uppercase; }
     .cf-val { font-size: 11.5px; font-weight: 700; font-family: 'Space Mono', monospace; border-bottom: 1px solid #94a3b8; min-height: 16px; padding: 1px 0; }
 
-    /* Main Cheque Paper (7.5in x 3.875in) */
+    /* Main Cheque Paper (178mm x 89mm / 7in x 3.5in) */
     .cheque-paper {
-      width: 7.5in;
-      height: 3.875in;
+      width: 178mm;
+      height: 89mm;
       position: relative;
       background: #ffffff;
       overflow: hidden;
+      transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    /* Rotation Modes on Screen Preview */
+    .full-cheque-wrapper.rot-0 {
+      width: auto;
+      height: 89mm;
+    }
+    .full-cheque-wrapper.rot-0 .cheque-paper {
+      width: 178mm;
+      height: 89mm;
+      transform: none;
+      transform-origin: 0 0;
+    }
+
+    /* 270°: Canon Rear Tray Clamped (89mm Narrow Edge — Photo 2) */
+    .full-cheque-wrapper.rot-270 {
+      width: 89mm !important;
+      height: 178mm !important;
+    }
+    .full-cheque-wrapper.rot-270 .cheque-paper {
+      width: 178mm !important;
+      height: 89mm !important;
+      transform-origin: 0 0 !important;
+      transform: rotate(-90deg) translate(-178mm, 0) !important;
+    }
+    .full-cheque-wrapper.rot-270 .counterfoil-paper {
+      display: none !important;
+    }
+
+    /* 90°: Vertical (90° Clockwise — Logo first) */
+    .full-cheque-wrapper.rot-90 {
+      width: 89mm !important;
+      height: 178mm !important;
+    }
+    .full-cheque-wrapper.rot-90 .cheque-paper {
+      width: 178mm !important;
+      height: 89mm !important;
+      transform-origin: 0 0 !important;
+      transform: rotate(90deg) translate(0, -89mm) !important;
+    }
+    .full-cheque-wrapper.rot-90 .counterfoil-paper {
+      display: none !important;
+    }
+
+    /* 180°: Inverted Horizontal */
+    .full-cheque-wrapper.rot-180 {
+      width: 178mm !important;
+      height: 89mm !important;
+    }
+    .full-cheque-wrapper.rot-180 .cheque-paper {
+      width: 178mm !important;
+      height: 89mm !important;
+      transform-origin: 89mm 44.5mm !important;
+      transform: rotate(180deg) !important;
     }
 
     /* Cheque Floating Elements with exact mm placements */
@@ -554,7 +610,19 @@
         display: none !important;
       }
 
-      /* FEED MODE 1: VERTICAL CLAMPED TRAY (Canon 89mm narrow edge — Photo 2) */
+      /* 0° Horizontal (178mm Wide Edge — Photo 1) */
+      body.feed-rot-0 .cheque-paper,
+      body.feed-horizontal .cheque-paper {
+        width: 178mm !important;
+        height: 89mm !important;
+        position: relative !important;
+        margin-top: var(--master-top, 0mm) !important;
+        margin-left: var(--master-left, 0mm) !important;
+        transform: none !important;
+      }
+
+      /* 270° Canon Clamped Tray (89mm Narrow Edge — Photo 2) */
+      body.feed-rot-270 .cheque-paper,
       body.feed-vert-canon .cheque-paper {
         width: 178mm !important;
         height: 89mm !important;
@@ -566,14 +634,27 @@
         overflow: visible !important;
       }
 
-      /* FEED MODE 2: HORIZONTAL FEED (178mm wide edge — Photo 1) */
-      body.feed-horizontal .cheque-paper {
-        width: 7.5in !important;
-        height: 3.875in !important;
+      /* 90° Vertical (Logo First) */
+      body.feed-rot-90 .cheque-paper {
+        width: 178mm !important;
+        height: 89mm !important;
+        position: absolute !important;
+        transform-origin: 0 0 !important;
+        transform: rotate(90deg) translate(0, -89mm) !important;
+        top: var(--master-top, 0mm) !important;
+        left: var(--master-left, 60.5mm) !important;
+        overflow: visible !important;
+      }
+
+      /* 180° Inverted */
+      body.feed-rot-180 .cheque-paper {
+        width: 178mm !important;
+        height: 89mm !important;
         position: relative !important;
         margin-top: var(--master-top, 0mm) !important;
         margin-left: var(--master-left, 0mm) !important;
-        transform: none !important;
+        transform-origin: 89mm 44.5mm !important;
+        transform: rotate(180deg) !important;
       }
     }
   </style>
@@ -656,11 +737,15 @@
             </select>
           </div>
 
-          <div class="ctrl-item">
-            <label>🖨️ Feed Direction:</label>
-            <select id="cqFeedMode" onchange="updateFeedMode()" style="font-weight:700; background:#0f172a; color:#38bdf8; border:1px solid #334155; border-radius:6px; padding:4px 8px;">
-              <option value="vert_canon" selected>⬇️ Canon Clamped Tray (89mm Narrow Edge — Photo 2)</option>
-              <option value="horizontal">↔️ Horizontal Feed (178mm Wide Edge — Photo 1)</option>
+          <div class="ctrl-item" style="background:rgba(56, 189, 248, 0.08); border:1px solid #38bdf8; padding:3px 8px; border-radius:8px; display:flex; align-items:center; gap:6px;">
+            <button type="button" class="btn btn-primary btn-sm" id="btnRotate" onclick="cycleChequeRotation()" style="font-weight:700; padding:5px 12px; display:flex; align-items:center; gap:6px; cursor:pointer;" title="Click to cycle cheque orientation (0° ↔ 270° Canon Tray ↔ 90° ↔ 180°)">
+              <span style="font-size:14px;">🔄</span> <span id="btnRotateLabel">Rotate (0°)</span>
+            </button>
+            <select id="cqRotSelect" onchange="setChequeRotation(this.value)" style="font-weight:700; background:#0f172a; color:#38bdf8; border:1px solid #334155; border-radius:6px; padding:5px 8px; cursor:pointer;" title="Cheque Print & Preview Orientation">
+              <option value="0" selected>0° — Horizontal (Wide Edge — Photo 1)</option>
+              <option value="270">270° — Canon Tray (89mm Narrow Edge — Photo 2)</option>
+              <option value="90">90° — Vertical (Logo First)</option>
+              <option value="180">180° — Inverted Horizontal</option>
             </select>
           </div>
 
@@ -755,7 +840,23 @@
 
         <!-- Cheque Canvas Area -->
         <div class="preview-canvas-card">
-          <div class="full-cheque-wrapper" id="fullChequeWrapper">
+          <!-- Canvas Top Quick Action Bar -->
+          <div class="no-print" style="width:100%; max-width:760px; display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; padding:0 4px;">
+            <div style="display:flex; align-items:center; gap:8px;">
+              <span style="font-size:12px; font-weight:800; color:#94a3b8; text-transform:uppercase; letter-spacing:0.5px;">👁️ Cheque Preview</span>
+              <span id="badgeRotation" style="background:#1e293b; color:#38bdf8; border:1px solid rgba(56,189,248,0.3); padding:2px 10px; border-radius:12px; font-size:11px; font-weight:700;">↔️ 0° Horizontal</span>
+            </div>
+            <div style="display:flex; gap:6px; align-items:center;">
+              <button type="button" class="btn btn-outline btn-sm" onclick="cycleChequeRotation()" style="font-size:11.5px; padding:4px 10px; font-weight:700; border-color:#38bdf8; color:#38bdf8; cursor:pointer;" title="Click to rotate cheque orientation">
+                🔄 Rotate 90°
+              </button>
+              <button type="button" class="btn btn-outline btn-sm" onclick="setChequeRotation(currentRotation === 270 ? 0 : 270)" style="font-size:11.5px; padding:4px 10px; font-weight:700; cursor:pointer;" title="Toggle between Horizontal (Photo 1) and Canon Tray (Photo 2)">
+                ⚡ Toggle Canon Tray
+              </button>
+            </div>
+          </div>
+
+          <div class="full-cheque-wrapper rot-0" id="fullChequeWrapper">
 
             <!-- Optional Counterfoil / Cheque Book Stub (Left Part) -->
             <div class="counterfoil-paper" id="counterfoilPaper" style="display:none;">
@@ -1121,7 +1222,8 @@
     function toggleCounterfoil() {
       const on = document.getElementById('chkCounterfoil').checked;
       document.getElementById('counterfoilPaper').style.display = on ? 'flex' : 'none';
-      document.body.className = on ? 'mode-cheque-stub' : 'mode-cheque-single';
+      document.body.classList.toggle('mode-cheque-stub', on);
+      document.body.classList.toggle('mode-cheque-single', !on);
     }
 
     function toggleGuide() {
@@ -1265,19 +1367,64 @@
       return String(s).replace(/[&<>"']/g, m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
     }
 
-    function updateFeedMode() {
-      const mode = document.getElementById('cqFeedMode')?.value || 'vert_canon';
-      const styleEl = document.getElementById('printPageStyle');
-      document.body.classList.remove('feed-vert-canon', 'feed-horizontal');
+    let currentRotation = 0; // 0, 90, 180, 270
 
-      if (mode === 'vert_canon') {
+    function setChequeRotation(deg) {
+      deg = parseInt(deg, 10);
+      if (isNaN(deg) || ![0, 90, 180, 270].includes(deg)) deg = 0;
+      currentRotation = deg;
+
+      const wrapper = document.getElementById('fullChequeWrapper');
+      const rotSelect = document.getElementById('cqRotSelect');
+      const btnLabel = document.getElementById('btnRotateLabel');
+      const badgeRot = document.getElementById('badgeRotation');
+      const styleEl = document.getElementById('printPageStyle');
+
+      if (rotSelect) rotSelect.value = String(deg);
+
+      if (wrapper) {
+        wrapper.classList.remove('rot-0', 'rot-90', 'rot-180', 'rot-270');
+        wrapper.classList.add('rot-' + deg);
+      }
+
+      document.body.classList.remove(
+        'feed-rot-0', 'feed-rot-90', 'feed-rot-180', 'feed-rot-270',
+        'feed-vert-canon', 'feed-horizontal'
+      );
+      document.body.classList.add('feed-rot-' + deg);
+
+      let shortLabel = `${deg}°`;
+      let badgeText = `${deg}°`;
+
+      if (deg === 0) {
+        shortLabel = '0° Horizontal';
+        badgeText = '↔️ 0° Horizontal (Photo 1)';
+        document.body.classList.add('feed-horizontal');
+        if (styleEl) styleEl.textContent = '@page { size: landscape; margin: 0mm !important; }';
+        const curLeft = parseFloat(document.getElementById('calMasterLeft')?.value || 0);
+        if (curLeft === 60.5) {
+          if (document.getElementById('calMasterLeft')) document.getElementById('calMasterLeft').value = 0;
+        }
+      } else if (deg === 270) {
+        shortLabel = '270° Canon Tray';
+        badgeText = '⬇️ 270° Canon Tray (Photo 2)';
         document.body.classList.add('feed-vert-canon');
         if (styleEl) styleEl.textContent = '@page { size: portrait; margin: 0mm !important; }';
         const curLeft = parseFloat(document.getElementById('calMasterLeft')?.value || 0);
         if (curLeft === 0) {
           if (document.getElementById('calMasterLeft')) document.getElementById('calMasterLeft').value = 60.5;
         }
-      } else {
+      } else if (deg === 90) {
+        shortLabel = '90° Vertical';
+        badgeText = '⬆️ 90° Vertical (Logo First)';
+        if (styleEl) styleEl.textContent = '@page { size: portrait; margin: 0mm !important; }';
+        const curLeft = parseFloat(document.getElementById('calMasterLeft')?.value || 0);
+        if (curLeft === 0) {
+          if (document.getElementById('calMasterLeft')) document.getElementById('calMasterLeft').value = 60.5;
+        }
+      } else if (deg === 180) {
+        shortLabel = '180° Inverted';
+        badgeText = '🔄 180° Inverted';
         document.body.classList.add('feed-horizontal');
         if (styleEl) styleEl.textContent = '@page { size: landscape; margin: 0mm !important; }';
         const curLeft = parseFloat(document.getElementById('calMasterLeft')?.value || 0);
@@ -1285,8 +1432,25 @@
           if (document.getElementById('calMasterLeft')) document.getElementById('calMasterLeft').value = 0;
         }
       }
-      localStorage.setItem('pw_feed_mode', mode);
+
+      if (btnLabel) btnLabel.textContent = `Rotate (${shortLabel})`;
+      if (badgeRot) badgeRot.textContent = badgeText;
+
+      localStorage.setItem('pw_cheque_rotation', String(deg));
       updateCalib();
+    }
+
+    function cycleChequeRotation() {
+      const order = [0, 270, 90, 180];
+      const idx = order.indexOf(currentRotation);
+      const nextDeg = order[(idx + 1) % order.length];
+      setChequeRotation(nextDeg);
+      toast(`Orientation set: ${nextDeg}°`);
+    }
+
+    function updateFeedMode() {
+      const savedRot = parseInt(localStorage.getItem('pw_cheque_rotation') || '0', 10);
+      setChequeRotation(savedRot);
     }
 
     function setMasterOffset(top, left) {
@@ -1318,14 +1482,13 @@
       if (document.getElementById('valMasterLeft')) document.getElementById('valMasterLeft').textContent = mLeft + 'mm';
 
       const wrapper = document.getElementById('fullChequeWrapper');
-      const feedMode = document.getElementById('cqFeedMode')?.value || 'vert_canon';
 
       if (wrapper) {
-        if (feedMode === 'horizontal') {
+        if (currentRotation === 0 || currentRotation === 180) {
           wrapper.style.marginTop = mTop + 'mm';
           wrapper.style.marginLeft = mLeft + 'mm';
         } else {
-          wrapper.style.marginTop = '0mm';
+          wrapper.style.marginTop = mTop + 'mm';
           wrapper.style.marginLeft = '0mm';
         }
       }
@@ -1705,9 +1868,8 @@
     // Set today date by default
     document.getElementById('cqDateInput').value = new Date().toISOString().slice(0, 10);
     applyBankPreset('ntb');
-    const savedFeedMode = localStorage.getItem('pw_feed_mode') || 'vert_canon';
-    if (document.getElementById('cqFeedMode')) document.getElementById('cqFeedMode').value = savedFeedMode;
-    updateFeedMode();
+    const savedRot = parseInt(localStorage.getItem('pw_cheque_rotation') || (localStorage.getItem('pw_feed_mode') === 'horizontal' ? '0' : '270'), 10);
+    setChequeRotation(savedRot);
     updateLiveCheque();
     checkAuth();
     initFromUrlParams();
