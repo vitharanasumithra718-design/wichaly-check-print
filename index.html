@@ -274,7 +274,10 @@
     /* Main Cheque Paper (178mm x 89mm / 7in x 3.5in) */
     .cheque-paper {
       width: 178mm;
+      min-width: 178mm;
       height: 89mm;
+      min-height: 89mm;
+      flex-shrink: 0;
       position: relative;
       background: #ffffff;
       overflow: hidden;
@@ -285,10 +288,15 @@
     .full-cheque-wrapper.rot-0 {
       width: auto;
       height: 89mm;
+      position: relative;
     }
     .full-cheque-wrapper.rot-0 .cheque-paper {
       width: 178mm;
+      min-width: 178mm;
       height: 89mm;
+      min-height: 89mm;
+      flex-shrink: 0;
+      position: relative;
       transform: none;
       transform-origin: 0 0;
     }
@@ -297,10 +305,17 @@
     .full-cheque-wrapper.rot-270 {
       width: 89mm !important;
       height: 178mm !important;
+      position: relative !important;
     }
     .full-cheque-wrapper.rot-270 .cheque-paper {
+      position: absolute !important;
+      top: 0 !important;
+      left: 0 !important;
       width: 178mm !important;
+      min-width: 178mm !important;
       height: 89mm !important;
+      min-height: 89mm !important;
+      flex-shrink: 0 !important;
       transform-origin: 0 0 !important;
       transform: rotate(-90deg) translate(-178mm, 0) !important;
     }
@@ -312,10 +327,17 @@
     .full-cheque-wrapper.rot-90 {
       width: 89mm !important;
       height: 178mm !important;
+      position: relative !important;
     }
     .full-cheque-wrapper.rot-90 .cheque-paper {
+      position: absolute !important;
+      top: 0 !important;
+      left: 0 !important;
       width: 178mm !important;
+      min-width: 178mm !important;
       height: 89mm !important;
+      min-height: 89mm !important;
+      flex-shrink: 0 !important;
       transform-origin: 0 0 !important;
       transform: rotate(90deg) translate(0, -89mm) !important;
     }
@@ -327,10 +349,17 @@
     .full-cheque-wrapper.rot-180 {
       width: 178mm !important;
       height: 89mm !important;
+      position: relative !important;
     }
     .full-cheque-wrapper.rot-180 .cheque-paper {
+      position: absolute !important;
+      top: 0 !important;
+      left: 0 !important;
       width: 178mm !important;
+      min-width: 178mm !important;
       height: 89mm !important;
+      min-height: 89mm !important;
+      flex-shrink: 0 !important;
       transform-origin: 89mm 44.5mm !important;
       transform: rotate(180deg) !important;
     }
@@ -347,6 +376,8 @@
       font-weight: 500;
       white-space: nowrap;
       line-height: 1;
+      color: #000000;
+      z-index: 10;
     }
     .cq-date-box .d-cell {
       display: inline-flex;
