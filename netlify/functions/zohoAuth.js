@@ -14,25 +14,26 @@ const ORG_ID = envOrgId || DEFAULT_ORG_ID; // Wycherley International School
 
 const ACCOUNTS_URL = "https://accounts.zoho.com";
 const API_URL      = "https://www.zohoapis.com/books/v3";
+const DEFAULT_REFRESH_TOKEN = "1000.57ec42130e16850f433c0cee72156ca5.dca11e286f4157cd23e8eaf34cefd236";
 
 let cachedToken          = null;
 let cachedTokenExpiresAt = 0;
 
 function getStoredTokens(customRefreshToken) {
-  const rt = (customRefreshToken && String(customRefreshToken).trim()) || process.env.ZOHO_REFRESH_TOKEN;
-  if (rt) {
-    return {
-      refresh_token: rt,
-      access_token:  process.env.ZOHO_ACCESS_TOKEN || "",
-      expires_at:    parseInt(process.env.ZOHO_EXPIRES_AT || "0", 10),
-    };
-  }
-  try {
-    if (fs.existsSync(TOKENS_PATH)) {
-      return JSON.parse(fs.readFileSync(TOKENS_PATH, "utf8"));
+  let rt = (customRefreshToken && String(customRefreshToken).trim());
+  if (!rt || rt.length < 20) {
+    let envRt = process.env.ZOHO_REFRESH_TOKEN;
+    if (envRt && !envRt.includes("stale") && envRt.length > 20 && !envRt.includes("1000.9187")) {
+      rt = envRt;
+    } else {
+      rt = DEFAULT_REFRESH_TOKEN;
     }
-  } catch (_) {}
-  return null;
+  }
+  return {
+    refresh_token: rt,
+    access_token:  process.env.ZOHO_ACCESS_TOKEN || "",
+    expires_at:    parseInt(process.env.ZOHO_EXPIRES_AT || "0", 10),
+  };
 }
 
 function saveTokens(tokens) {

@@ -1649,8 +1649,13 @@
       return (document.getElementById('cfgOrgId') && document.getElementById('cfgOrgId').value.trim()) || '933829154';
     }
 
+    const DEFAULT_REFRESH_TOKEN = '1000.57ec42130e16850f433c0cee72156ca5.dca11e286f4157cd23e8eaf34cefd236';
+
     function getSavedRefreshToken() {
-      return (document.getElementById('cfgRefreshToken') && document.getElementById('cfgRefreshToken').value.trim()) || localStorage.getItem('zoho_refresh_token') || '';
+      const saved = (document.getElementById('cfgRefreshToken') && document.getElementById('cfgRefreshToken').value.trim()) || localStorage.getItem('zoho_refresh_token');
+      if (saved && saved.length > 20 && !saved.includes('9187')) return saved;
+      try { localStorage.setItem('zoho_refresh_token', DEFAULT_REFRESH_TOKEN); } catch(_) {}
+      return DEFAULT_REFRESH_TOKEN;
     }
 
     function saveManualRefreshToken() {
@@ -1702,6 +1707,10 @@
           if (!hasUrlId && (!currentRecord || !currentRecord.payment_id)) {
             selectPayment(data.payments[0].payment_id, false);
           }
+        } else if (data.error) {
+          console.error('Zoho load error:', data.error);
+          sel.innerHTML = '<option value="">(Error connecting to Zoho — Click to Retry)</option>';
+          toast('⚠️ Zoho: ' + (typeof data.error === 'string' ? data.error : JSON.stringify(data.error)));
         } else {
           sel.innerHTML = '<option value="">(No payments found in Zoho)</option>';
         }
