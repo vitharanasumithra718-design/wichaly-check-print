@@ -240,6 +240,13 @@
     /* =========================================================================
        PRINTABLE CHEQUE WRAPPER (Cheque + Optional Counterfoil)
        ========================================================================= */
+    :root {
+      --cq-width: 178mm;
+      --cq-height: 89mm;
+      --master-top: 0mm;
+      --master-left: 0mm;
+    }
+
     .full-cheque-wrapper {
       display: flex;
       background: #ffffff;
@@ -250,12 +257,15 @@
       font-family: 'Plus Jakarta Sans', sans-serif;
       user-select: none;
       position: relative;
+      margin-top: var(--master-top, 0mm);
+      margin-left: var(--master-left, 0mm);
+      transition: width 0.2s, height 0.2s;
     }
 
     /* Counterfoil / Left Stub Paper */
     .counterfoil-paper {
       width: 2.75in;
-      height: 3.875in;
+      height: var(--cq-height, 89mm);
       border-right: 1.5px dashed #64748b;
       padding: 12px 14px;
       font-size: 11px;
@@ -270,13 +280,51 @@
     .cf-label { font-size: 9.5px; font-weight: 700; color: #475569; text-transform: uppercase; }
     .cf-val { font-size: 11.5px; font-weight: 700; font-family: 'Space Mono', monospace; border-bottom: 1px solid #94a3b8; min-height: 16px; padding: 1px 0; }
 
-    /* Main Cheque Paper (7.5in x 3.875in) */
+    /* Main Cheque Paper (178mm x 89mm / 7.0in x 3.5in) */
     .cheque-paper {
-      width: 7.5in;
-      height: 3.875in;
+      width: var(--cq-width, 178mm);
+      height: var(--cq-height, 89mm);
       position: relative;
       background: #ffffff;
       overflow: hidden;
+      transform-origin: 0 0;
+      transition: transform 0.2s;
+    }
+
+    /* PRINTER FEED ORIENTATIONS */
+    /* Mode 1: Vertical Left Feed 90deg (Narrow 89mm edge first, Date first - Exactly as in Printer Photo) */
+    body.feed-vert-90 .full-cheque-wrapper {
+      width: var(--cq-height, 89mm) !important;
+      height: var(--cq-width, 178mm) !important;
+    }
+    body.feed-vert-90 .cheque-paper {
+      width: var(--cq-width, 178mm) !important;
+      height: var(--cq-height, 89mm) !important;
+      transform: translateY(var(--cq-width, 178mm)) rotate(-90deg) !important;
+    }
+
+    /* Mode 2: Vertical Left Feed Reversed 270deg */
+    body.feed-vert-270 .full-cheque-wrapper {
+      width: var(--cq-height, 89mm) !important;
+      height: var(--cq-width, 178mm) !important;
+    }
+    body.feed-vert-270 .cheque-paper {
+      width: var(--cq-width, 178mm) !important;
+      height: var(--cq-height, 89mm) !important;
+      transform: translateX(var(--cq-height, 89mm)) rotate(90deg) !important;
+    }
+
+    /* Mode 3: Horizontal Feed (Wide 178mm edge first) */
+    body.feed-horiz .full-cheque-wrapper,
+    body.feed-a4 .full-cheque-wrapper {
+      width: var(--cq-width, 178mm) !important;
+      height: var(--cq-height, 89mm) !important;
+    }
+    body.feed-horiz .cheque-paper,
+    body.feed-a4 .cheque-paper {
+      width: var(--cq-width, 178mm) !important;
+      height: var(--cq-height, 89mm) !important;
+      transform: none !important;
     }
 
     /* Cheque Floating Elements with exact mm placements */
@@ -483,16 +531,20 @@
     /* =========================================================================
        PRINT RULES (PERFECT ZERO MARGIN CHEQUE PRINT)
        ========================================================================= */
-    @page {
-      size: landscape;
-      margin: 0mm !important;
-    }
-
     @media print {
-      @page {
-        size: landscape;
-        margin: 0mm !important;
+      body.feed-vert-90, body.feed-vert-270 {
+        @page {
+          size: portrait;
+          margin: 0mm !important;
+        }
       }
+      body.feed-horiz, body.feed-a4 {
+        @page {
+          size: landscape;
+          margin: 0mm !important;
+        }
+      }
+
       body, html {
         background: transparent !important;
         margin: 0 !important;
@@ -535,6 +587,9 @@
         background: transparent !important;
         page-break-inside: avoid !important;
         page-break-after: avoid !important;
+        position: absolute !important;
+        top: var(--master-top, 0mm) !important;
+        left: var(--master-left, 0mm) !important;
       }
 
       .cheque-paper {
@@ -549,10 +604,6 @@
       /* Cheque without counterfoil */
       body.mode-cheque-single .counterfoil-paper {
         display: none !important;
-      }
-      body.mode-cheque-single .cheque-paper {
-        width: 7.5in !important;
-        height: 3.875in !important;
       }
     }
   </style>
@@ -596,11 +647,11 @@
       <!-- Interactive Cheque Control Toolbar -->
       <div class="cheque-control-box no-print">
         
-        <!-- Row 1: Bank, Date, Crossing, Quick Payment Selector, Print Button -->
+        <!-- Row 1: Bank, Date, Crossing, Feed Direction, Print Button -->
         <div class="cq-toolbar-row" style="flex-wrap:wrap; gap:10px;">
           <div class="ctrl-item" style="background:#1e293b; border:1px solid #0284c7; padding:4px 10px; border-radius:8px;">
             <label style="color:#38bdf8; font-weight:700;">⚡ Zoho Payment:</label>
-            <select id="quickPaymentSelect" onchange="if(this.value) selectPayment(this.value)" style="min-width:240px; background:#0f172a; color:#fff; border:1px solid #334155;">
+            <select id="quickPaymentSelect" onchange="if(this.value) selectPayment(this.value)" style="min-width:230px; background:#0f172a; color:#fff; border:1px solid #334155;">
               <option value="">Loading Zoho payments...</option>
             </select>
             <button class="btn btn-secondary btn-sm" onclick="loadQuickPayments(true)" title="Refresh Payments">🔄</button>
@@ -608,7 +659,7 @@
 
           <div class="ctrl-item">
             <label>🏦 Bank:</label>
-            <select id="bankPreset" onchange="applyBankPreset(this.value)" style="min-width:170px;">
+            <select id="bankPreset" onchange="applyBankPreset(this.value)" style="min-width:160px;">
               <option value="ntb" selected>Nations Trust Bank (NTB)</option>
               <option value="commercial">Commercial Bank</option>
               <option value="sampath">Sampath Bank</option>
@@ -616,6 +667,16 @@
               <option value="boc">Bank of Ceylon (BOC)</option>
               <option value="seylan">Seylan Bank</option>
               <option value="custom">Custom Alignment</option>
+            </select>
+          </div>
+
+          <div class="ctrl-item" style="background:#064e3b; border:1px solid #10b981; padding:4px 8px; border-radius:8px;">
+            <label style="color:#6ee7b7; font-weight:700;">🖨️ Printer Feed Mode:</label>
+            <select id="cqFeedMode" onchange="onFeedModeChange()" style="font-size:12px; padding:4px 6px; font-weight:700; background:#0f172a; color:#34d399; border:1px solid #059669; border-radius:6px;">
+              <option value="vert_90" selected>⬇️ Vertical Feed (Narrow 89mm Edge — As in Photo)</option>
+              <option value="horiz">➡️ Horizontal Feed (Wide 178mm Edge)</option>
+              <option value="vert_270">🔄 Vertical Feed (Reversed 270°)</option>
+              <option value="a4">📄 Standard A4 Top-Left (0, 0)</option>
             </select>
           </div>
 
@@ -631,7 +692,7 @@
 
           <div class="ctrl-item">
             <label>Crossing Mode:</label>
-            <select id="cqCrossingSelect" onchange="updateLiveCheque()" style="min-width:240px; font-weight:600; background:#0f172a; color:#38bdf8; border:1px solid #334155; border-radius:6px;">
+            <select id="cqCrossingSelect" onchange="updateLiveCheque()" style="min-width:210px; font-weight:600; background:#0f172a; color:#38bdf8; border:1px solid #334155; border-radius:6px;">
               <option value="cross_h_ac_payee" selected>Horizontal (═ AC payee only ═)</option>
               <option value="cross_h_ac_payee_title">Horizontal (═ A/C Payee Only ═)</option>
               <option value="cross_h_ac_payee_upper">Horizontal (═ A/C PAYEE ONLY ═)</option>
@@ -806,6 +867,24 @@
             <button class="btn btn-ghost btn-sm" onclick="resetCalibration()">Reset</button>
           </h3>
 
+          <!-- Cheque Leaf Dimensions (from ruler: 178mm x 89mm) -->
+          <div class="calib-group" style="background:#0f2b48; border:1px solid #0284c7; margin-bottom:12px;">
+            <div class="calib-header" style="color:#38bdf8;">
+              <span>📏 Cheque Leaf Size</span>
+              <span id="valCqSize">178mm × 89mm</span>
+            </div>
+            <div class="calib-row">
+              <span style="width:60px;">Length:</span>
+              <input type="range" id="calCqWidth" min="150" max="220" step="1" value="178" oninput="updateCalib()">
+              <span class="val" id="valCqWidth" style="width:38px; font-size:10.5px;">178mm</span>
+            </div>
+            <div class="calib-row">
+              <span style="width:60px;">Height:</span>
+              <input type="range" id="calCqHeight" min="70" max="110" step="1" value="89" oninput="updateCalib()">
+              <span class="val" id="valCqHeight" style="width:38px; font-size:10.5px;">89mm</span>
+            </div>
+          </div>
+
           <!-- Master Page Offset -->
           <div class="calib-group" style="background:#0f2b48; border:1px solid #0284c7; margin-bottom:12px;">
             <div class="calib-header" style="color:#38bdf8;">
@@ -977,14 +1056,14 @@
       document.getElementById('fileWarnBanner').classList.add('show');
     }
 
-    // Bank Calibration Presets
+    // Bank Calibration Presets (Calibrated to Sri Lankan physical cheque leaves)
     const BANK_PRESETS = {
-      ntb: { dateTop: 5.0, dateLeft: 132, dateSpacing: 0.8, dateBoxWidth: 4.8, dateFontSize: 13.5, dateFormat: 'skip_20', crossTop: 4, crossLeft: 6, crossWidth: 45, payeeTop: 20, payeeLeft: 22, wordsTop: 30, wordsLeft: 22, amtTop: 42, amtRight: 24 },
-      commercial: { dateTop: 5.5, dateLeft: 128, dateSpacing: 0.8, dateBoxWidth: 4.8, dateFontSize: 13.5, dateFormat: 'skip_20', crossTop: 4, crossLeft: 6, crossWidth: 45, payeeTop: 20, payeeLeft: 22, wordsTop: 31, wordsLeft: 22, amtTop: 36, amtRight: 36 },
-      sampath: { dateTop: 3, dateLeft: 128, dateSpacing: 0.8, dateBoxWidth: 4.8, dateFontSize: 13.5, dateFormat: 'skip_20', crossTop: 4, crossLeft: 6, crossWidth: 45, payeeTop: 18, payeeLeft: 22, wordsTop: 28, wordsLeft: 22, amtTop: 36, amtRight: 36 },
-      hnb: { dateTop: 4.5, dateLeft: 126, dateSpacing: 0.8, dateBoxWidth: 4.8, dateFontSize: 13.5, dateFormat: 'skip_20', crossTop: 4, crossLeft: 6, crossWidth: 45, payeeTop: 19, payeeLeft: 22, wordsTop: 29, wordsLeft: 22, amtTop: 35, amtRight: 34 },
-      boc: { dateTop: 5, dateLeft: 127, dateSpacing: 0.8, dateBoxWidth: 4.8, dateFontSize: 13.5, dateFormat: 'skip_20', crossTop: 4, crossLeft: 6, crossWidth: 45, payeeTop: 21, payeeLeft: 20, wordsTop: 32, wordsLeft: 20, amtTop: 37, amtRight: 35 },
-      seylan: { dateTop: 5.5, dateLeft: 128, dateSpacing: 0.8, dateBoxWidth: 4.8, dateFontSize: 13.5, dateFormat: 'skip_20', crossTop: 4, crossLeft: 6, crossWidth: 45, payeeTop: 20, payeeLeft: 22, wordsTop: 30, wordsLeft: 22, amtTop: 36, amtRight: 36 }
+      ntb: { cqWidth: 178, cqHeight: 89, dateTop: 5.5, dateLeft: 132, dateSpacing: 0.8, dateBoxWidth: 4.8, dateFontSize: 13.5, dateFormat: 'skip_20', crossTop: 4, crossLeft: 6, crossWidth: 45, payeeTop: 20, payeeLeft: 22, wordsTop: 29.5, wordsLeft: 22, amtTop: 40, amtRight: 24 },
+      commercial: { cqWidth: 178, cqHeight: 89, dateTop: 5.5, dateLeft: 128, dateSpacing: 0.8, dateBoxWidth: 4.8, dateFontSize: 13.5, dateFormat: 'skip_20', crossTop: 4, crossLeft: 6, crossWidth: 45, payeeTop: 20, payeeLeft: 22, wordsTop: 31, wordsLeft: 22, amtTop: 36, amtRight: 36 },
+      sampath: { cqWidth: 178, cqHeight: 89, dateTop: 3.5, dateLeft: 128, dateSpacing: 0.8, dateBoxWidth: 4.8, dateFontSize: 13.5, dateFormat: 'skip_20', crossTop: 4, crossLeft: 6, crossWidth: 45, payeeTop: 18, payeeLeft: 22, wordsTop: 28, wordsLeft: 22, amtTop: 36, amtRight: 36 },
+      hnb: { cqWidth: 178, cqHeight: 89, dateTop: 4.5, dateLeft: 126, dateSpacing: 0.8, dateBoxWidth: 4.8, dateFontSize: 13.5, dateFormat: 'skip_20', crossTop: 4, crossLeft: 6, crossWidth: 45, payeeTop: 19, payeeLeft: 22, wordsTop: 29, wordsLeft: 22, amtTop: 35, amtRight: 34 },
+      boc: { cqWidth: 178, cqHeight: 89, dateTop: 5.0, dateLeft: 127, dateSpacing: 0.8, dateBoxWidth: 4.8, dateFontSize: 13.5, dateFormat: 'skip_20', crossTop: 4, crossLeft: 6, crossWidth: 45, payeeTop: 21, payeeLeft: 20, wordsTop: 32, wordsLeft: 20, amtTop: 37, amtRight: 35 },
+      seylan: { cqWidth: 178, cqHeight: 89, dateTop: 5.5, dateLeft: 128, dateSpacing: 0.8, dateBoxWidth: 4.8, dateFontSize: 13.5, dateFormat: 'skip_20', crossTop: 4, crossLeft: 6, crossWidth: 45, payeeTop: 20, payeeLeft: 22, wordsTop: 30, wordsLeft: 22, amtTop: 36, amtRight: 36 }
     };
 
     let currentRecord = {
@@ -1223,24 +1302,43 @@
       return String(s).replace(/[&<>"']/g, m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
     }
 
+    function onFeedModeChange() {
+      const mode = (document.getElementById('cqFeedMode') && document.getElementById('cqFeedMode').value) || 'vert_90';
+      document.body.classList.remove('feed-vert-90', 'feed-vert-270', 'feed-horiz', 'feed-a4');
+      if (mode === 'vert_90') {
+        document.body.classList.add('feed-vert-90');
+      } else if (mode === 'vert_270') {
+        document.body.classList.add('feed-vert-270');
+      } else if (mode === 'horiz') {
+        document.body.classList.add('feed-horiz');
+      } else if (mode === 'a4') {
+        document.body.classList.add('feed-a4');
+      }
+      localStorage.setItem('pw_feed_mode', mode);
+      updateCalib();
+    }
+
     function setMasterOffset(top, left) {
       if (document.getElementById('calMasterTop')) document.getElementById('calMasterTop').value = top;
       if (document.getElementById('calMasterLeft')) document.getElementById('calMasterLeft').value = left;
       updateCalib();
-      toast(`Shifted cheque: Top ${top}mm, Left ${left}mm`);
     }
 
     function updateCalib() {
+      const cqWidth = parseFloat(document.getElementById('calCqWidth')?.value || 178);
+      const cqHeight = parseFloat(document.getElementById('calCqHeight')?.value || 89);
       const mTop = parseFloat(document.getElementById('calMasterTop')?.value || 0);
       const mLeft = parseFloat(document.getElementById('calMasterLeft')?.value || 0);
-      if (document.getElementById('valMaster')) {
-        document.getElementById('valMaster').textContent = `Top: ${mTop}mm, Left: ${mLeft}mm`;
-      }
-      const wrapper = document.getElementById('fullChequeWrapper');
-      if (wrapper) {
-        wrapper.style.marginTop = mTop + 'mm';
-        wrapper.style.marginLeft = mLeft + 'mm';
-      }
+
+      document.documentElement.style.setProperty('--cq-width', cqWidth + 'mm');
+      document.documentElement.style.setProperty('--cq-height', cqHeight + 'mm');
+      document.documentElement.style.setProperty('--master-top', mTop + 'mm');
+      document.documentElement.style.setProperty('--master-left', mLeft + 'mm');
+
+      if (document.getElementById('valCqSize')) document.getElementById('valCqSize').textContent = `${cqWidth}mm × ${cqHeight}mm`;
+      if (document.getElementById('valCqWidth')) document.getElementById('valCqWidth').textContent = `${cqWidth}mm`;
+      if (document.getElementById('valCqHeight')) document.getElementById('valCqHeight').textContent = `${cqHeight}mm`;
+      if (document.getElementById('valMaster')) document.getElementById('valMaster').textContent = `Top: ${mTop}mm, Left: ${mLeft}mm`;
 
       const dTop = document.getElementById('calDateTop').value;
       const dLeft = document.getElementById('calDateLeft').value;
@@ -1307,6 +1405,8 @@
         try { p = { ...p, ...JSON.parse(saved) }; } catch (_) {}
       }
 
+      if (document.getElementById('calCqWidth')) document.getElementById('calCqWidth').value = p.cqWidth || 178;
+      if (document.getElementById('calCqHeight')) document.getElementById('calCqHeight').value = p.cqHeight || 89;
       if (document.getElementById('calMasterTop')) document.getElementById('calMasterTop').value = p.masterTop || 0;
       if (document.getElementById('calMasterLeft')) document.getElementById('calMasterLeft').value = p.masterLeft || 0;
       if (document.getElementById('calDateTop')) document.getElementById('calDateTop').value = p.dateTop;
@@ -1331,6 +1431,8 @@
     function resetCalibration() {
       applyBankPreset('ntb');
       document.getElementById('bankPreset').value = 'ntb';
+      if (document.getElementById('calCqWidth')) document.getElementById('calCqWidth').value = 178;
+      if (document.getElementById('calCqHeight')) document.getElementById('calCqHeight').value = 89;
       if (document.getElementById('calMasterTop')) document.getElementById('calMasterTop').value = 0;
       if (document.getElementById('calMasterLeft')) document.getElementById('calMasterLeft').value = 0;
       updateCalib();
@@ -1340,6 +1442,8 @@
     function saveBankProfile() {
       const bank = document.getElementById('bankPreset').value;
       const cfg = {
+        cqWidth: document.getElementById('calCqWidth')?.value || 178,
+        cqHeight: document.getElementById('calCqHeight')?.value || 89,
         masterTop: document.getElementById('calMasterTop')?.value || 0,
         masterLeft: document.getElementById('calMasterLeft')?.value || 0,
         dateTop: document.getElementById('calDateTop').value,
@@ -1614,8 +1718,11 @@
       }
     }
 
-    // Set today date by default
+    // Initialize defaults
     document.getElementById('cqDateInput').value = new Date().toISOString().slice(0, 10);
+    const savedFeedMode = localStorage.getItem('pw_feed_mode') || 'vert_90';
+    if (document.getElementById('cqFeedMode')) document.getElementById('cqFeedMode').value = savedFeedMode;
+    onFeedModeChange();
     applyBankPreset('ntb');
     updateLiveCheque();
     checkAuth();
