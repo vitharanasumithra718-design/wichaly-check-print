@@ -485,14 +485,6 @@
       --master-left: 60.5mm;
     }
 
-    /* Screen rotated preview if checked */
-    .cheque-paper.screen-rotated {
-      transform-origin: top left;
-      transform: rotate(-90deg) translate(-178mm, 0) !important;
-      margin-left: var(--master-left, 60.5mm) !important;
-      margin-top: var(--master-top, 0mm) !important;
-    }
-
     /* =========================================================================
        PRINT RULES (ZERO MARGIN DUAL-FEED PRINT ENGINE)
        ========================================================================= */
@@ -544,12 +536,14 @@
         left: 0 !important;
         margin: 0 !important;
         padding: 0 !important;
+        overflow: visible !important;
       }
 
       .cheque-paper {
         box-shadow: none !important;
         border: none !important;
         background: transparent !important;
+        overflow: visible !important;
       }
       .cheque-paper.show-guide {
         background-image: none !important;
@@ -565,10 +559,11 @@
         width: 178mm !important;
         height: 89mm !important;
         position: absolute !important;
-        transform-origin: top left !important;
+        transform-origin: 0 0 !important;
         transform: rotate(-90deg) translate(-178mm, 0) !important;
         top: var(--master-top, 0mm) !important;
         left: var(--master-left, 60.5mm) !important;
+        overflow: visible !important;
       }
 
       /* FEED MODE 2: HORIZONTAL FEED (178mm wide edge — Photo 1) */
@@ -667,9 +662,6 @@
               <option value="vert_canon" selected>⬇️ Canon Clamped Tray (89mm Narrow Edge — Photo 2)</option>
               <option value="horizontal">↔️ Horizontal Feed (178mm Wide Edge — Photo 1)</option>
             </select>
-            <label style="font-size:11px; color:#94a3b8; display:inline-flex; align-items:center; gap:3px; cursor:pointer;" title="Rotate preview on screen to match printer feed">
-              <input type="checkbox" id="chkRotPreview" onchange="toggleRotPreview()"> 🔄 Rotate Screen View
-            </label>
           </div>
 
           <div class="ctrl-item">
@@ -1297,25 +1289,11 @@
       updateCalib();
     }
 
-    function toggleRotPreview() {
-      const isRot = document.getElementById('chkRotPreview')?.checked;
-      const paper = document.getElementById('chequePaper');
-      const canvasCard = document.querySelector('.preview-canvas-card');
-      if (isRot) {
-        paper.classList.add('screen-rotated');
-        if (canvasCard) canvasCard.style.minHeight = '210mm';
-      } else {
-        paper.classList.remove('screen-rotated');
-        if (canvasCard) canvasCard.style.minHeight = '';
-      }
-      updateCalib();
-    }
-
     function setMasterOffset(top, left) {
       if (document.getElementById('calMasterTop')) document.getElementById('calMasterTop').value = top;
       if (document.getElementById('calMasterLeft')) document.getElementById('calMasterLeft').value = left;
       updateCalib();
-      toast(`Shifted cheque: Top ${top}mm, Left ${left}mm`);
+      toast(`Shifted: Top ${top}mm, Left ${left}mm`);
     }
 
     function nudgeMaster(dTop, dLeft) {
@@ -1341,10 +1319,9 @@
 
       const wrapper = document.getElementById('fullChequeWrapper');
       const feedMode = document.getElementById('cqFeedMode')?.value || 'vert_canon';
-      const isRotPreview = document.getElementById('chkRotPreview')?.checked;
 
       if (wrapper) {
-        if (feedMode === 'horizontal' || !isRotPreview) {
+        if (feedMode === 'horizontal') {
           wrapper.style.marginTop = mTop + 'mm';
           wrapper.style.marginLeft = mLeft + 'mm';
         } else {
