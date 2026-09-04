@@ -286,45 +286,7 @@
       height: var(--cq-height, 89mm);
       position: relative;
       background: #ffffff;
-      overflow: hidden;
-      transform-origin: 0 0;
-      transition: transform 0.2s;
-    }
-
-    /* PRINTER FEED ORIENTATIONS */
-    /* Mode 1: Vertical Left Feed 90deg (Narrow 89mm edge first, Date first - Exactly as in Printer Photo) */
-    body.feed-vert-90 .full-cheque-wrapper {
-      width: var(--cq-height, 89mm) !important;
-      height: var(--cq-width, 178mm) !important;
-    }
-    body.feed-vert-90 .cheque-paper {
-      width: var(--cq-width, 178mm) !important;
-      height: var(--cq-height, 89mm) !important;
-      transform: translateY(var(--cq-width, 178mm)) rotate(-90deg) !important;
-    }
-
-    /* Mode 2: Vertical Left Feed Reversed 270deg */
-    body.feed-vert-270 .full-cheque-wrapper {
-      width: var(--cq-height, 89mm) !important;
-      height: var(--cq-width, 178mm) !important;
-    }
-    body.feed-vert-270 .cheque-paper {
-      width: var(--cq-width, 178mm) !important;
-      height: var(--cq-height, 89mm) !important;
-      transform: translateX(var(--cq-height, 89mm)) rotate(90deg) !important;
-    }
-
-    /* Mode 3: Horizontal Feed (Wide 178mm edge first) */
-    body.feed-horiz .full-cheque-wrapper,
-    body.feed-a4 .full-cheque-wrapper {
-      width: var(--cq-width, 178mm) !important;
-      height: var(--cq-height, 89mm) !important;
-    }
-    body.feed-horiz .cheque-paper,
-    body.feed-a4 .cheque-paper {
-      width: var(--cq-width, 178mm) !important;
-      height: var(--cq-height, 89mm) !important;
-      transform: none !important;
+      overflow: visible;
     }
 
     /* Cheque Floating Elements with exact mm placements */
@@ -529,20 +491,74 @@
     .toast.show { opacity: 1; transform: none; }
 
     /* =========================================================================
-       PRINT RULES (PERFECT ZERO MARGIN CHEQUE PRINT)
+       PRINT RULES (PERFECT ZERO MARGIN CHEQUE PRINT WITH FEED ROTATIONS)
        ========================================================================= */
     @media print {
-      body.feed-vert-90, body.feed-vert-270 {
+      body.feed-vert-90 {
         @page {
           size: portrait;
           margin: 0mm !important;
         }
       }
+      body.feed-vert-90 .full-cheque-wrapper {
+        width: var(--cq-height, 89mm) !important;
+        height: var(--cq-width, 178mm) !important;
+        position: absolute !important;
+        top: var(--master-top, 0mm) !important;
+        left: var(--master-left, 0mm) !important;
+        overflow: visible !important;
+      }
+      body.feed-vert-90 .cheque-paper {
+        width: var(--cq-width, 178mm) !important;
+        height: var(--cq-height, 89mm) !important;
+        transform-origin: 0 0 !important;
+        transform: translateY(var(--cq-width, 178mm)) rotate(-90deg) !important;
+        overflow: visible !important;
+      }
+
+      body.feed-vert-270 {
+        @page {
+          size: portrait;
+          margin: 0mm !important;
+        }
+      }
+      body.feed-vert-270 .full-cheque-wrapper {
+        width: var(--cq-height, 89mm) !important;
+        height: var(--cq-width, 178mm) !important;
+        position: absolute !important;
+        top: var(--master-top, 0mm) !important;
+        left: var(--master-left, 0mm) !important;
+        overflow: visible !important;
+      }
+      body.feed-vert-270 .cheque-paper {
+        width: var(--cq-width, 178mm) !important;
+        height: var(--cq-height, 89mm) !important;
+        transform-origin: 0 0 !important;
+        transform: translateX(var(--cq-height, 89mm)) rotate(90deg) !important;
+        overflow: visible !important;
+      }
+
       body.feed-horiz, body.feed-a4 {
         @page {
           size: landscape;
           margin: 0mm !important;
         }
+      }
+      body.feed-horiz .full-cheque-wrapper,
+      body.feed-a4 .full-cheque-wrapper {
+        width: var(--cq-width, 178mm) !important;
+        height: var(--cq-height, 89mm) !important;
+        position: absolute !important;
+        top: var(--master-top, 0mm) !important;
+        left: var(--master-left, 0mm) !important;
+        overflow: visible !important;
+      }
+      body.feed-horiz .cheque-paper,
+      body.feed-a4 .cheque-paper {
+        width: var(--cq-width, 178mm) !important;
+        height: var(--cq-height, 89mm) !important;
+        transform: none !important;
+        overflow: visible !important;
       }
 
       body, html {
@@ -555,7 +571,7 @@
         -webkit-print-color-adjust: exact !important;
         print-color-adjust: exact !important;
       }
-      .file-warn-banner, header.app-nav, .cheque-control-box, .calib-card, .no-print, .toast {
+      .file-warn-banner, header.app-nav, .cheque-control-box, .calib-card, .no-print, .toast, .feed-info-pill {
         display: none !important;
       }
       .container {
@@ -587,9 +603,6 @@
         background: transparent !important;
         page-break-inside: avoid !important;
         page-break-after: avoid !important;
-        position: absolute !important;
-        top: var(--master-top, 0mm) !important;
-        left: var(--master-left, 0mm) !important;
       }
 
       .cheque-paper {
@@ -781,6 +794,11 @@
 
         <!-- Cheque Canvas Area -->
         <div class="preview-canvas-card">
+          <div class="feed-info-pill no-print" style="background:#0f2b48; border:1px solid #0284c7; padding:6px 14px; border-radius:8px; margin-bottom:14px; display:flex; justify-content:space-between; align-items:center; font-size:12px; color:#38bdf8; font-weight:600; width:100%; max-width:750px;">
+            <span>🖨️ Selected Feed: <strong style="color:#fff;" id="feedStatusText">⬇️ Vertical Feed (Narrow 89mm Edge — As in Photo)</strong></span>
+            <span style="color:#94a3b8; font-size:11px;">Cheque Leaf: 178mm × 89mm (NTB)</span>
+          </div>
+
           <div class="full-cheque-wrapper" id="fullChequeWrapper">
 
             <!-- Optional Counterfoil / Cheque Book Stub (Left Part) -->
@@ -1305,14 +1323,22 @@
     function onFeedModeChange() {
       const mode = (document.getElementById('cqFeedMode') && document.getElementById('cqFeedMode').value) || 'vert_90';
       document.body.classList.remove('feed-vert-90', 'feed-vert-270', 'feed-horiz', 'feed-a4');
+      let label = '⬇️ Vertical Feed (Narrow 89mm Edge — As in Photo)';
       if (mode === 'vert_90') {
         document.body.classList.add('feed-vert-90');
+        label = '⬇️ Vertical Feed 90° (Narrow 89mm Edge — As in Photo)';
       } else if (mode === 'vert_270') {
         document.body.classList.add('feed-vert-270');
+        label = '🔄 Vertical Feed Reversed 270°';
       } else if (mode === 'horiz') {
         document.body.classList.add('feed-horiz');
+        label = '➡️ Horizontal Feed (Wide 178mm Edge)';
       } else if (mode === 'a4') {
         document.body.classList.add('feed-a4');
+        label = '📄 Standard A4 Top-Left (0, 0)';
+      }
+      if (document.getElementById('feedStatusText')) {
+        document.getElementById('feedStatusText').textContent = label;
       }
       localStorage.setItem('pw_feed_mode', mode);
       updateCalib();
