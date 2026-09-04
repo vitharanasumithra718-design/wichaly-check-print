@@ -929,11 +929,11 @@
             <div class="calib-header"><span>Date Box Position &amp; Grid</span><span id="valDate">5, 132</span></div>
             <div class="calib-row">
               <span style="width:70px;">Top:</span>
-              <input type="range" id="calDateTop" min="0" max="30" step="0.5" value="5" oninput="updateCalib()">
+              <input type="range" id="calDateTop" min="0" max="85" step="0.5" value="5.5" oninput="updateCalib()">
             </div>
             <div class="calib-row">
               <span style="width:70px;">Left:</span>
-              <input type="range" id="calDateLeft" min="80" max="170" step="0.5" value="132" oninput="updateCalib()">
+              <input type="range" id="calDateLeft" min="60" max="175" step="0.5" value="132" oninput="updateCalib()">
             </div>
             <div class="calib-row">
               <span style="width:70px;">Digit Gap:</span>
@@ -972,40 +972,40 @@
 
           <!-- Payee Alignment -->
           <div class="calib-group">
-            <div class="calib-header"><span>Payee Name</span><span id="valPayee">19, 22</span></div>
+            <div class="calib-header"><span>Payee Name</span><span id="valPayee">20, 22</span></div>
             <div class="calib-row">
               <span style="width:28px;">Top:</span>
-              <input type="range" id="calPayeeTop" min="10" max="40" step="0.5" value="19" oninput="updateCalib()">
+              <input type="range" id="calPayeeTop" min="5" max="60" step="0.5" value="20" oninput="updateCalib()">
             </div>
             <div class="calib-row">
               <span style="width:28px;">Left:</span>
-              <input type="range" id="calPayeeLeft" min="10" max="60" step="0.5" value="22" oninput="updateCalib()">
+              <input type="range" id="calPayeeLeft" min="10" max="120" step="0.5" value="22" oninput="updateCalib()">
             </div>
           </div>
 
           <!-- Words Alignment -->
           <div class="calib-group">
-            <div class="calib-header"><span>Amount in Words</span><span id="valWords">29, 22</span></div>
+            <div class="calib-header"><span>Amount in Words</span><span id="valWords">29.5, 22</span></div>
             <div class="calib-row">
               <span style="width:28px;">Top:</span>
-              <input type="range" id="calWordsTop" min="20" max="60" step="0.5" value="29" oninput="updateCalib()">
+              <input type="range" id="calWordsTop" min="10" max="70" step="0.5" value="29.5" oninput="updateCalib()">
             </div>
             <div class="calib-row">
               <span style="width:28px;">Left:</span>
-              <input type="range" id="calWordsLeft" min="10" max="60" step="0.5" value="22" oninput="updateCalib()">
+              <input type="range" id="calWordsLeft" min="10" max="120" step="0.5" value="22" oninput="updateCalib()">
             </div>
           </div>
 
           <!-- Numeric Amount Alignment -->
           <div class="calib-group">
-            <div class="calib-header"><span>Amount (Number)</span><span id="valAmt">35, 34</span></div>
+            <div class="calib-header"><span>Amount (Number)</span><span id="valAmt">40, 24</span></div>
             <div class="calib-row">
               <span style="width:28px;">Top:</span>
-              <input type="range" id="calAmtTop" min="20" max="60" step="0.5" value="35" oninput="updateCalib()">
+              <input type="range" id="calAmtTop" min="10" max="85" step="0.5" value="40" oninput="updateCalib()">
             </div>
             <div class="calib-row">
               <span style="width:28px;">Right:</span>
-              <input type="range" id="calAmtRight" min="10" max="80" step="0.5" value="34" oninput="updateCalib()">
+              <input type="range" id="calAmtRight" min="0" max="100" step="0.5" value="24" oninput="updateCalib()">
             </div>
           </div>
 
@@ -1077,11 +1077,11 @@
     // Bank Calibration Presets (Calibrated to Sri Lankan physical cheque leaves)
     const BANK_PRESETS = {
       ntb: { cqWidth: 178, cqHeight: 89, dateTop: 5.5, dateLeft: 132, dateSpacing: 0.8, dateBoxWidth: 4.8, dateFontSize: 13.5, dateFormat: 'skip_20', crossTop: 4, crossLeft: 6, crossWidth: 45, payeeTop: 20, payeeLeft: 22, wordsTop: 29.5, wordsLeft: 22, amtTop: 40, amtRight: 24 },
+      seylan: { cqWidth: 178, cqHeight: 89, dateTop: 62.0, dateLeft: 125, dateSpacing: 0.8, dateBoxWidth: 4.8, dateFontSize: 13.5, dateFormat: 'skip_20', crossTop: 4, crossLeft: 6, crossWidth: 45, payeeTop: 11, payeeLeft: 38, wordsTop: 20, wordsLeft: 38, amtTop: 58, amtRight: 55 },
       commercial: { cqWidth: 178, cqHeight: 89, dateTop: 5.5, dateLeft: 128, dateSpacing: 0.8, dateBoxWidth: 4.8, dateFontSize: 13.5, dateFormat: 'skip_20', crossTop: 4, crossLeft: 6, crossWidth: 45, payeeTop: 20, payeeLeft: 22, wordsTop: 31, wordsLeft: 22, amtTop: 36, amtRight: 36 },
       sampath: { cqWidth: 178, cqHeight: 89, dateTop: 3.5, dateLeft: 128, dateSpacing: 0.8, dateBoxWidth: 4.8, dateFontSize: 13.5, dateFormat: 'skip_20', crossTop: 4, crossLeft: 6, crossWidth: 45, payeeTop: 18, payeeLeft: 22, wordsTop: 28, wordsLeft: 22, amtTop: 36, amtRight: 36 },
       hnb: { cqWidth: 178, cqHeight: 89, dateTop: 4.5, dateLeft: 126, dateSpacing: 0.8, dateBoxWidth: 4.8, dateFontSize: 13.5, dateFormat: 'skip_20', crossTop: 4, crossLeft: 6, crossWidth: 45, payeeTop: 19, payeeLeft: 22, wordsTop: 29, wordsLeft: 22, amtTop: 35, amtRight: 34 },
-      boc: { cqWidth: 178, cqHeight: 89, dateTop: 5.0, dateLeft: 127, dateSpacing: 0.8, dateBoxWidth: 4.8, dateFontSize: 13.5, dateFormat: 'skip_20', crossTop: 4, crossLeft: 6, crossWidth: 45, payeeTop: 21, payeeLeft: 20, wordsTop: 32, wordsLeft: 20, amtTop: 37, amtRight: 35 },
-      seylan: { cqWidth: 178, cqHeight: 89, dateTop: 5.5, dateLeft: 128, dateSpacing: 0.8, dateBoxWidth: 4.8, dateFontSize: 13.5, dateFormat: 'skip_20', crossTop: 4, crossLeft: 6, crossWidth: 45, payeeTop: 20, payeeLeft: 22, wordsTop: 30, wordsLeft: 22, amtTop: 36, amtRight: 36 }
+      boc: { cqWidth: 178, cqHeight: 89, dateTop: 5.0, dateLeft: 127, dateSpacing: 0.8, dateBoxWidth: 4.8, dateFontSize: 13.5, dateFormat: 'skip_20', crossTop: 4, crossLeft: 6, crossWidth: 45, payeeTop: 21, payeeLeft: 20, wordsTop: 32, wordsLeft: 20, amtTop: 37, amtRight: 35 }
     };
 
     let currentRecord = {
